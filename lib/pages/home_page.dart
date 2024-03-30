@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stocklab_fe/colors.dart';
 import 'stock_page.dart';
 
+// ignore: must_be_immutable
 class HomePage extends StatelessWidget {
   var height, width;
 

@@ -1,51 +1,69 @@
 import 'package:flutter/material.dart';
 import '../colors.dart';
+import '../models/Stock.dart';
+import '../network/StockService.dart';
+import '../widgets/grid_item_stock.dart';
+import '../colors.dart';
+import 'stock/add_stock_page.dart';
 
 class StockPage extends StatefulWidget {
+  StockPage() : super();
+
+  final String title = "Stok Gudang";
+
   @override
-  _StockPageState createState() => _StockPageState();
+  DataStockState createState() => DataStockState();
 }
 
-class _StockPageState extends State<StockPage> {
+class DataStockState extends State<StockPage> {
+  List<Stock> _stocks = [];
+  late Stock _selectedStock;
+  late bool _isUpdating;
+  late String _titleProgress;
   var height, width;
 
-  List imgData = [
-    "assets/icon/stock.png",
-    "assets/icon/stock.png",
-    "assets/icon/stock.png",
-    "assets/icon/stock.png",
-  ];
-  List itemName = [
-    "Accu",
-    "Oli",
-    "Radiator",
-    "Ban",
-  ];
-
-  List itemPrice = [
-    "20.000",
-    "30.000",
-    "499.999",
-    "200.000",
-  ];
-
-  List itemStock = [
-    "10",
-    "20",
-    "30",
-    "40",
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _isUpdating = false;
+    _titleProgress = widget.title;
+    _getStocks();
+  }
 
   String selectedFilter = 'Semua';
   String selectedSort = 'A-Z';
+
+  _showProgress(String message) {
+    setState(() {
+      _titleProgress = message;
+    });
+  }
+
+  _getStocks() {
+    _showProgress('Memuat Stok...');
+    StockService.getStocks().then((stocks) {
+      setState(() {
+        _stocks = stocks;
+      });
+      _showProgress(widget.title);
+    }).catchError((error) {
+      print('Error fetching stocks: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to fetch stocks. Please try again later.'),
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Stock Gudang'),
+        title: Text(_titleProgress),
         actions: [
           IconButton(
               onPressed: () {
@@ -54,12 +72,20 @@ class _StockPageState extends State<StockPage> {
                   delegate: StockSearch(),
                 );
               },
-              icon: const Icon(Icons.search)),
+            icon: Visibility(
+              visible: !_stocks.isEmpty,
+              child: const Icon(Icons.search),
+            ),
+          ),
           IconButton(
               onPressed: () async {
                 // await showFilterSortDialog(context);
               },
-              icon: const Icon(Icons.filter_list)),
+            icon: Visibility(
+              visible: !_stocks.isEmpty,
+              child: const Icon(Icons.filter_list),
+            ),
+          ),
         ],
         backgroundColor: primary,
         foregroundColor: Colors.white,
@@ -73,128 +99,98 @@ class _StockPageState extends State<StockPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  DropdownButton<String>(
-                    value: selectedFilter,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedFilter = value!;
-                      });
-                    },
-                    items: ['Semua', 'Filter 1', 'Filter 2', 'Filter 3']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                  Visibility(
+                    visible: !_stocks.isEmpty,
+                    child: DropdownButton<String>(
+                      value: selectedFilter,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedFilter = value!;
+                        });
+                      },
+                      items: ['Semua', 'Filter 1', 'Filter 2', 'Filter 3']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                   ),
                   SizedBox(
                     width: 16,
                   ),
-                  DropdownButton<String>(
-                    value: selectedSort,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedSort = value!;
-                      });
-                    },
-                    items: ['A-Z', 'Z-A']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                  Visibility(
+                    visible: !_stocks.isEmpty,
+                    child: DropdownButton<String>(
+                      value: selectedSort,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedSort = value!;
+                        });
+                      },
+                      items: ['A-Z', 'Z-A']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 8), // Tambahkan jarak antara dropdown dan konten
-            Container(
-              height: height,
-              width: width,
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  childAspectRatio: 3.1,
-                  mainAxisSpacing: 1,
-                  crossAxisSpacing: 1,
-                ),
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: imgData.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            spreadRadius: 1,
-                            blurRadius: 2,
-                          ),
-                        ],
+            SizedBox(height: 8),
+
+            //item list
+            _stocks.isEmpty
+                ? Column(
+                    children: [
+                      SizedBox(height: 20),
+                      Image.asset(
+                        "assets/icon/not_found_item.jpg",
+                        width: 300,
+                        height: 300,
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              imgData[index],
-                              width: 70,
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      itemName[index],
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 2),
-                                    child: Text(
-                                      'Rp. ${itemPrice[index]}',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 4),
-                                    child: Text(
-                                      'Stok : ${itemStock[index]}',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                      Text(
+                        'Tidak ada data yang tersedia.',
+                        style: TextStyle(fontSize: 18),
                       ),
+                    ],
+                  )
+                : Container(
+                    height: height,
+                    width: width,
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        childAspectRatio: 3.1,
+                        mainAxisSpacing: 1,
+                        crossAxisSpacing: 1,
+                      ),
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _stocks.length,
+                      itemBuilder: (context, index) {
+                        final stock = _stocks[index];
+                        return StockItem(stock: stock);
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: primary,
+        tooltip: 'Add',
+        onPressed: (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddStockPage()),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }

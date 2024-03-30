@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'colors.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'pages/home_page.dart';
-import 'pages/stock_page.dart';
-import 'pages/account_page.dart';
-import 'pages/history_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,12 +8,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
-  final _pageController = PageController();
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-  }
 
   // This widget is the root of your application.
   @override
@@ -25,54 +15,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        // appBar: AppBar(
-        //   centerTitle: true,
-        //   title: Text('Curved Navigation Bar'),
-        //   backgroundColor: const Color.fromARGB(255, 255, 240, 219),
-        //   foregroundColor: Colors.black,
-        // ),
         body: PageView(
-          controller: _pageController,
           children: <Widget>[
             HomePage(),
-            // HistoryPage(),
-            // StockPage(),
-            // AccountPage()
           ],
         ),
-        // bottomNavigationBar: CurvedNavigationBar(
-        //   backgroundColor: Colors.white,
-        //   buttonBackgroundColor: primary,
-        //   color: primary,
-        //   height: 65,
-        //   items: const <Widget>[
-        //     Icon(
-        //       Icons.home,
-        //       size: 35,
-        //       color: Colors.white,
-        //     ),
-        //     Icon(
-        //       Icons.person,
-        //       size: 35,
-        //       color: Colors.white,
-        //     ),
-        //     Icon(
-        //       Icons.person,
-        //       size: 35,
-        //       color: Colors.white,
-        //     ),
-        //     Icon(
-        //       Icons.person,
-        //       size: 35,
-        //       color: Colors.white,
-        //     )
-        //   ],
-        //   onTap: (index) {
-        //     _pageController.animateToPage(index,
-        //         duration: const Duration(milliseconds: 1),
-        //         curve: Curves.easeOut);
-        //   },
-        // ),
       ),
     );
   }
