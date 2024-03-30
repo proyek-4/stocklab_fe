@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../colors.dart';
 import '../../network/StockService.dart';
+import 'package:http/http.dart' as http;
+import 'package:quickalert/quickalert.dart';
 
 class AddStockPage extends StatefulWidget {
   AddStockPage() : super();
@@ -18,32 +20,68 @@ class _AddStockPageState extends State<AddStockPage> {
   TextEditingController _descriptionController = TextEditingController();
   late String _titleProgress;
 
-  _addStock() {
-    if (_nameController.text
-        .trim()
-        .isEmpty ||
-        _priceController.text
-            .trim()
-            .isEmpty ||
-        _quantityController.text
-            .trim()
-            .isEmpty) {
-      print("Empty fields");
-      return;
-    }
+  _addStock() async {
+    _showProgress('Menyimpan stok...');
 
-    _showProgress('Tambah Stok...');
+    try {
+      var url = Uri.parse('http://10.0.2.2:8000/api/stocks');
+      var response = await http.post(
+        url,
+        body: {
+          'name': _nameController.text,
+          'price': _priceController.text,
+          'quantity': _quantityController.text,
+          'description': _descriptionController.text,
+        },
+      );
 
-    StockService.addStock(
-      _nameController.text,
-      int.parse(_priceController.text),
-      int.parse(_quantityController.text),
-      _descriptionController.text,
-    ).then((result) {
-      if (result) {
+      if (response.statusCode == 200) {
+        await QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          text: "Stok berhasil ditambah.",
+        );
+        Navigator.pop(context);
+      } else {
+        print('Failed to add stock: ${response.body}');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Failed to add stock. ${response.body}. Please try again.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       }
-      _clearValues();
-    });
+    } catch (e) {
+      print('Error adding stock: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to add stock. $e. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   _showProgress(String message) {
@@ -59,9 +97,12 @@ class _AddStockPageState extends State<AddStockPage> {
     _descriptionController.clear();
   }
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _formKey,
       appBar: AppBar(
         title: Text('Tambah Stok Gudang'),
         backgroundColor: primary,
@@ -69,73 +110,110 @@ class _AddStockPageState extends State<AddStockPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(18.3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                controller: _nameController,
-                cursorColor: Colors.black,
-                decoration: InputDecoration(
-                  labelText: 'Nama',
-                  labelStyle: TextStyle(color: Colors.black),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: primary),
+        child: SingleChildScrollView(
+          child: Form(
+            key : _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: TextFormField(
+                    controller: _nameController,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      labelText: 'Nama',
+                      labelStyle: TextStyle(color: Colors.black),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: primary),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kolom harus diisi!';
+                      }
+                      return null;
+                    },
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                controller: _priceController,
-                cursorColor: Colors.black,
-                decoration: InputDecoration(
-                  labelText: 'Harga',
-                  labelStyle: TextStyle(color: Colors.black),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: primary),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: TextFormField(
+                    controller: _priceController,
+                    keyboardType: TextInputType.number,
+                    cursorColor: Colors.black,
+                    decoration: InputDecoration(
+                      labelText: 'Harga',
+                      labelStyle: TextStyle(color: Colors.black),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: primary),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kolom harus diisi!';
+                      }
+                      return null;
+                    },
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                controller: _quantityController,
-                cursorColor: Colors.black,
-                decoration: InputDecoration(
-                  labelText: 'Stok',
-                  labelStyle: TextStyle(color: Colors.black),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: primary),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: TextFormField(
+                    controller: _quantityController,
+                    cursorColor: Colors.black,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Stok',
+                      labelStyle: TextStyle(color: Colors.black),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: primary),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kolom harus diisi!';
+                      }
+                      return null;
+                    },
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                controller: _descriptionController,
-                cursorColor: Colors.black,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: 'Deskripsi',
-                  labelStyle: TextStyle(color: Colors.black),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: primary),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: TextFormField(
+                    controller: _descriptionController,
+                    cursorColor: Colors.black,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      labelText: 'Deskripsi',
+                      labelStyle: TextStyle(color: Colors.black),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: primary),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(height: 16),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Processing Data')),
+                        );
+                        _addStock();
+                      }
+                    },
+                    child: Text('Tambah'),
+                    style: ElevatedButton.styleFrom(
+                      primary: primary,
+                      onPrimary: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _addStock,
-              child: Text('Tambah'),
-              labelStyle: TextStyle(color: Colors.black),
-            ),
-          ],
+          ),
         ),
       ),
     );

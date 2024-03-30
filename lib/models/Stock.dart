@@ -1,6 +1,6 @@
 class Stock {
-  int id, price, quantity;
-  String name, description, image;
+  final int id, price, quantity;
+  final String name, description, image;
 
   Stock(
       {this.id = 0,
@@ -16,7 +16,7 @@ class Stock {
       price: json['price'],
       quantity: json['quantity'],
       name: json['name'],
-      description: json['description'],
+      description: json['description'] ?? '-',
       image: json['image'],
     );
   }

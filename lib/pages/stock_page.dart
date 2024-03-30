@@ -3,8 +3,8 @@ import '../colors.dart';
 import '../models/Stock.dart';
 import '../network/StockService.dart';
 import '../widgets/grid_item_stock.dart';
-import '../colors.dart';
 import 'stock/add_stock_page.dart';
+import '../provider/StockProvider.dart';
 
 class StockPage extends StatefulWidget {
   StockPage() : super();
