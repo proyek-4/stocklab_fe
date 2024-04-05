@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/Stock.dart';
 import 'package:flutter/widgets.dart';
+import 'bottom_sheet_modal.dart';
 
 class StockItem extends StatelessWidget {
   final Stock stock;
@@ -11,7 +12,14 @@ class StockItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String imageUrl = "http://10.0.2.2:8000" + stock.image;
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return BottomSheetModal(stock: stock);
+          },
+        );
+      },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         decoration: BoxDecoration(
@@ -42,11 +50,11 @@ class StockItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 4),
+                      padding: EdgeInsets.only(top: 2),
                       child: Text(
-                        stock.name,
+                        stock.name.length > 20 ? '${stock.name.substring(0, 20)}...' : stock.name,
                         style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -56,16 +64,16 @@ class StockItem extends StatelessWidget {
                       child: Text(
                         'Rp. ${stock.price}',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 13,
                         ),
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 4),
+                      padding: EdgeInsets.only(top: 2),
                       child: Text(
                         'Stok : ${stock.quantity}',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 13,
                         ),
                       ),
                     ),

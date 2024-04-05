@@ -90,97 +90,91 @@ class DataStockState extends State<StockPage> {
         backgroundColor: primary,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Visibility(
-                    visible: !_stocks.isEmpty,
-                    child: DropdownButton<String>(
-                      value: selectedFilter,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedFilter = value!;
-                        });
-                      },
-                      items: ['Semua', 'Filter 1', 'Filter 2', 'Filter 3']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 16,
-                  ),
-                  Visibility(
-                    visible: !_stocks.isEmpty,
-                    child: DropdownButton<String>(
-                      value: selectedSort,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedSort = value!;
-                        });
-                      },
-                      items: ['A-Z', 'Z-A']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Visibility(
+                              visible: !_stocks.isEmpty,
+                              child: DropdownButton<String>(
+                                value: selectedFilter,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedFilter = value!;
+                                  });
+                                },
+                                items: ['Semua', 'Filter 1', 'Filter 2', 'Filter 3']
+                                    .map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 16,
+                            ),
+                            Visibility(
+                              visible: !_stocks.isEmpty,
+                              child: DropdownButton<String>(
+                                value: selectedSort,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedSort = value!;
+                                  });
+                                },
+                                items: ['A-Z', 'Z-A']
+                                    .map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                    ],
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 8),
-
-            //item list
-            _stocks.isEmpty
-                ? Column(
-                    children: [
-                      SizedBox(height: 20),
-                      Image.asset(
-                        "assets/icon/not_found_item.jpg",
-                        width: 300,
-                        height: 300,
-                      ),
-                      Text(
-                        'Tidak ada data yang tersedia.',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  )
-                : Container(
-                    height: height,
-                    width: width,
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        childAspectRatio: 3.1,
-                        mainAxisSpacing: 1,
-                        crossAxisSpacing: 1,
-                      ),
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: _stocks.length,
-                      itemBuilder: (context, index) {
-                        final stock = _stocks[index];
-                        return StockItem(stock: stock);
-                      },
-                    ),
-                  ),
-          ],
-        ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                childAspectRatio: 3.7,
+                mainAxisSpacing: 1,
+                crossAxisSpacing: 1,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                  final stock = _stocks[index];
+                  return StockItem(stock: stock);
+                },
+                childCount: _stocks.length,
+              ),
+            ),
+          ),
+        ],
       ),
+
       floatingActionButton: FloatingActionButton(
         backgroundColor: primary,
         tooltip: 'Add',
