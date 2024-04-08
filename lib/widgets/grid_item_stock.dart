@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/Stock.dart';
 import 'package:flutter/widgets.dart';
 import 'bottom_sheet_modal.dart';
+import '../utils.dart';
 
 class StockItem extends StatelessWidget {
   final Stock stock;
@@ -10,7 +11,7 @@ class StockItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String imageUrl = "http://10.0.2.2:8000" + stock.image;
+    String imageUrl = url + stock.image;
     return InkWell(
       onTap: () {
         showModalBottomSheet(
@@ -52,7 +53,9 @@ class StockItem extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(top: 2),
                       child: Text(
-                        stock.name.length > 20 ? '${stock.name.substring(0, 20)}...' : stock.name,
+                        stock.name.length > 20
+                            ? '${stock.name.substring(0, 20)}...'
+                            : stock.name,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -62,7 +65,7 @@ class StockItem extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(top: 2),
                       child: Text(
-                        'Rp. ${stock.price}',
+                        formatPrice(stock.price),
                         style: TextStyle(
                           fontSize: 13,
                         ),

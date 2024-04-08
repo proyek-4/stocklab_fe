@@ -66,21 +66,21 @@ class DataStockState extends State<StockPage> {
         title: Text(_titleProgress),
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: StockSearch(),
-                );
-              },
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: StockSearch(),
+              );
+            },
             icon: Visibility(
               visible: !_stocks.isEmpty,
               child: const Icon(Icons.search),
             ),
           ),
           IconButton(
-              onPressed: () async {
-                // await showFilterSortDialog(context);
-              },
+            onPressed: () async {
+              // await showFilterSortDialog(context);
+            },
             icon: Visibility(
               visible: !_stocks.isEmpty,
               child: const Icon(Icons.filter_list),
@@ -93,7 +93,8 @@ class DataStockState extends State<StockPage> {
       body: CustomScrollView(
         slivers: [
           SliverPadding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+            padding:
+                EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
             sliver: SliverList(
               delegate: SliverChildListDelegate(
                 [
@@ -101,7 +102,8 @@ class DataStockState extends State<StockPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -114,8 +116,12 @@ class DataStockState extends State<StockPage> {
                                     selectedFilter = value!;
                                   });
                                 },
-                                items: ['Semua', 'Filter 1', 'Filter 2', 'Filter 3']
-                                    .map<DropdownMenuItem<String>>((String value) {
+                                items: [
+                                  'Semua',
+                                  'Filter 1',
+                                  'Filter 2',
+                                  'Filter 3'
+                                ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
@@ -135,8 +141,10 @@ class DataStockState extends State<StockPage> {
                                     selectedSort = value!;
                                   });
                                 },
-                                items: ['A-Z', 'Z-A']
-                                    .map<DropdownMenuItem<String>>((String value) {
+                                items: [
+                                  'A-Z',
+                                  'Z-A'
+                                ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
@@ -159,12 +167,12 @@ class DataStockState extends State<StockPage> {
             sliver: SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1,
-                childAspectRatio: 3.7,
+                childAspectRatio: 3.5,
                 mainAxisSpacing: 1,
                 crossAxisSpacing: 1,
               ),
               delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
+                (BuildContext context, int index) {
                   final stock = _stocks[index];
                   return StockItem(stock: stock);
                 },
@@ -174,11 +182,10 @@ class DataStockState extends State<StockPage> {
           ),
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
         backgroundColor: primary,
         tooltip: 'Add',
-        onPressed: (){
+        onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddStockPage()),
