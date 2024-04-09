@@ -7,9 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../widgets/alert_image.dart';
 import '../../widgets/error_dialog.dart';
-import '../../helper/upload_image.dart';
-import 'package:mime/mime.dart';
-import 'package:path/path.dart' as path;
+import 'package:http_parser/http_parser.dart';
 import '../../utils.dart';
 
 class AddStockPage extends StatefulWidget {
@@ -40,29 +38,32 @@ class _AddStockPageState extends State<AddStockPage> {
     });
   }
 
-  _addStock() async {
+  Future<void> _addStock() async {
     _showProgress('Menyimpan stok...');
 
     try {
-      String? imageUrl;
+      var uri = Uri.parse(url + '/api/stocks');
+      var request = http.MultipartRequest('POST', uri);
+
+      request.fields.addAll({
+        'name': _nameController.text,
+        'price': _priceController.text,
+        'quantity': _quantityController.text,
+        'description': _descriptionController.text,
+        'date': _dateController.text,
+      });
+
       if (_image != null) {
-        imageUrl = await uploadImage(_image!);
-        if (imageUrl == null) {
-          throw Exception('Gagal mengunggah gambar.');
-        }
+        var mimeType = 'image/jpeg';
+        var multipartFile = await http.MultipartFile.fromPath(
+          'image',
+          _image!.path,
+          contentType: MediaType.parse(mimeType),
+        );
+        request.files.add(multipartFile);
       }
 
-      var uri = Uri.parse(url + '/api/stocks');
-      var response = await http.post(
-        uri,
-        body: {
-          'name': _nameController.text,
-          'price': _priceController.text,
-          'quantity': _quantityController.text,
-          'description': _descriptionController.text,
-          'date': _dateController.text,
-        },
-      );
+      var response = await request.send();
 
       if (response.statusCode == 200) {
         await QuickAlert.show(
@@ -72,13 +73,18 @@ class _AddStockPageState extends State<AddStockPage> {
         );
         Navigator.pop(context);
       } else {
-        print('Failed to add stock: ${response.body}');
-        showErrorDialog(context,
-            'Failed to add stock. ${response.body}. Please try again.');
+        print('Failed to add stock: ${response.statusCode}');
+        showErrorDialog(
+          context,
+          'Failed to add stock. ${response.reasonPhrase}. Please try again.',
+        );
       }
     } catch (e) {
       print('Error adding stock: $e');
-      showErrorDialog(context, 'Failed to add stock. $e. Please try again.');
+      showErrorDialog(
+        context,
+        'Failed to add stock. $e. Please try again.',
+      );
     }
   }
 
