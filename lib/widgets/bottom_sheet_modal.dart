@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/Stock.dart';
 import '../utils.dart';
 import 'package:intl/intl.dart';
+import 'image_loader.dart';
 
 class BottomSheetModal extends StatelessWidget {
   final Stock stock;
@@ -66,8 +67,8 @@ class BottomSheetModal extends StatelessWidget {
                               child: Center(
                                 child: Hero(
                                   tag: 'stock_image_${stock.id}',
-                                  child: Image.network(
-                                    imageUrl,
+                                  child: ImageLoader(
+                                    imageUrl: imageUrl,
                                     width: 100,
                                     height: 100,
                                     fit: BoxFit.cover,
@@ -128,6 +129,8 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: GestureDetector(
         onTap: () {
@@ -136,9 +139,11 @@ class DetailScreen extends StatelessWidget {
         child: Center(
           child: Hero(
             tag: 'stock_image_$stockId',
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
+            child: ImageLoader(
+              imageUrl: imageUrl,
+              width: screenSize.width,
+              height: 1000,
+              fit: BoxFit.contain,
             ),
           ),
         ),

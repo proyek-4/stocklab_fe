@@ -9,6 +9,8 @@ import '../../widgets/alert_image.dart';
 import '../../widgets/error_dialog.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../utils.dart';
+import 'package:provider/provider.dart';
+import '../../provider/StockProvider.dart';
 
 class AddStockPage extends StatefulWidget {
   AddStockPage() : super();
@@ -71,6 +73,7 @@ class _AddStockPageState extends State<AddStockPage> {
           type: QuickAlertType.success,
           text: "Stok berhasil ditambah.",
         );
+        Provider.of<StockProvider>(context, listen: false).loadStocks();
         Navigator.pop(context);
       } else {
         print('Failed to add stock: ${response.statusCode}');

@@ -3,6 +3,7 @@ import '../models/Stock.dart';
 import 'package:flutter/widgets.dart';
 import 'bottom_sheet_modal.dart';
 import '../utils.dart';
+import 'image_loader.dart';
 
 class StockItem extends StatelessWidget {
   final Stock stock;
@@ -39,9 +40,11 @@ class StockItem extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.network(
-                imageUrl,
+              ImageLoader(
+                imageUrl: imageUrl,
                 width: 70,
+                height: 70,
+                fit: BoxFit.cover,
               ),
               SizedBox(
                 width: 20,

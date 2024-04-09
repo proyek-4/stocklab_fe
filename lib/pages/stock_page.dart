@@ -4,6 +4,7 @@ import '../models/Stock.dart';
 import '../network/StockService.dart';
 import '../widgets/grid_item_stock.dart';
 import 'stock/add_stock_page.dart';
+import 'package:provider/provider.dart';
 import '../provider/StockProvider.dart';
 
 class StockPage extends StatefulWidget {
@@ -21,39 +22,23 @@ class DataStockState extends State<StockPage> {
   late bool _isUpdating;
   late String _titleProgress;
   var height, width;
+  late StockProvider _stockProvider;
 
   @override
   void initState() {
     super.initState();
     _isUpdating = false;
     _titleProgress = widget.title;
-    _getStocks();
+    Future.microtask(() {
+      Provider.of<StockProvider>(context, listen: false).loadStocks();
+    });
   }
 
   String selectedFilter = 'Semua';
   String selectedSort = 'A-Z';
 
-  _showProgress(String message) {
-    setState(() {
-      _titleProgress = message;
-    });
-  }
-
-  _getStocks() {
-    _showProgress('Memuat Stok...');
-    StockService.getStocks().then((stocks) {
-      setState(() {
-        _stocks = stocks;
-      });
-      _showProgress(widget.title);
-    }).catchError((error) {
-      print('Error fetching stocks: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to fetch stocks. Please try again later.'),
-        ),
-      );
-    });
+  Future<void> _refreshStocks() async {
+    await _stockProvider.loadStocks();
   }
 
   @override
@@ -90,97 +75,108 @@ class DataStockState extends State<StockPage> {
         backgroundColor: primary,
         foregroundColor: Colors.white,
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding:
-                EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Visibility(
-                              visible: !_stocks.isEmpty,
-                              child: DropdownButton<String>(
-                                value: selectedFilter,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedFilter = value!;
-                                  });
-                                },
-                                items: [
-                                  'Semua',
-                                  'Filter 1',
-                                  'Filter 2',
-                                  'Filter 3'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
+      body: RefreshIndicator(
+        onRefresh: _refreshStocks,
+        child: Consumer<StockProvider>(
+          builder: (context, provider, _) {
+            if (provider.isLoading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Visibility(
+                                      visible: !provider.stocks.isEmpty,
+                                      child: DropdownButton<String>(
+                                        value: selectedFilter,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedFilter = value!;
+                                          });
+                                        },
+                                        items: [
+                                          'Semua',
+                                          'Filter 1',
+                                          'Filter 2',
+                                          'Filter 3'
+                                        ].map<DropdownMenuItem<String>>((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 16,
+                                    ),
+                                    Visibility(
+                                      visible: !provider.stocks.isEmpty,
+                                      child: DropdownButton<String>(
+                                        value: selectedSort,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedSort = value!;
+                                          });
+                                        },
+                                        items: [
+                                          'A-Z',
+                                          'Z-A'
+                                        ].map<DropdownMenuItem<String>>((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              width: 16,
-                            ),
-                            Visibility(
-                              visible: !_stocks.isEmpty,
-                              child: DropdownButton<String>(
-                                value: selectedSort,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedSort = value!;
-                                  });
-                                },
-                                items: [
-                                  'A-Z',
-                                  'Z-A'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
-                        ),
+                              SizedBox(height: 8),
+                            ],
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 8),
-                    ],
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        childAspectRatio: 3.5,
+                        mainAxisSpacing: 1,
+                        crossAxisSpacing: 1,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          final stock = provider.stocks[index];
+                          return StockItem(stock: stock);
+                        },
+                        childCount: provider.stocks.length,
+                      ),
+                    ),
                   ),
                 ],
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: 5),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                childAspectRatio: 3.5,
-                mainAxisSpacing: 1,
-                crossAxisSpacing: 1,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  final stock = _stocks[index];
-                  return StockItem(stock: stock);
-                },
-                childCount: _stocks.length,
-              ),
-            ),
-          ),
-        ],
+              );
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: primary,
