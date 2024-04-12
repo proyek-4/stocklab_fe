@@ -16,14 +16,20 @@ class StockProvider extends ChangeNotifier {
 
   Future<void> loadStocks() async {
     try {
-      await Future.delayed(Duration(seconds: 2));
+      isLoading =
+          true; // Menandakan bahwa proses pengambilan data sedang berlangsung
       List<Stock> loadedStocks = await StockService.getStocks();
-      _stocks = loadedStocks;
-      notifyListeners();
+      // Memperbarui _stocks hanya jika data yang dimuat tidak kosong
+      if (loadedStocks.isNotEmpty) {
+        _stocks = loadedStocks;
+      }
     } catch (error) {
       print('Error loading stocks: $error');
       // Throw exception to indicate failure
       throw Exception('Failed to load stocks');
+    } finally {
+      isLoading =
+          false; // Memberitahu bahwa proses pengambilan data sudah selesai
     }
   }
 

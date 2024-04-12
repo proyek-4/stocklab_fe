@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import '../colors.dart';
 import '../models/Stock.dart';
@@ -23,6 +25,7 @@ class DataStockState extends State<StockPage> {
   late String _titleProgress;
   var height, width;
   late StockProvider _stockProvider;
+  bool isSearch = false;
 
   @override
   void initState() {
@@ -41,6 +44,13 @@ class DataStockState extends State<StockPage> {
     await _stockProvider.loadStocks();
   }
 
+  List<Stock> _filterStocks(String query, StockProvider provider) {
+    return provider.stocks
+        .where(
+            (stock) => stock.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
@@ -49,27 +59,40 @@ class DataStockState extends State<StockPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(_titleProgress),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            isSearch
+                ? setState(() {
+                    isSearch = false;
+                  })
+                : Navigator.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: StockSearch(),
-              );
+                delegate: StockSearch(
+                  Provider.of<StockProvider>(context, listen: false),
+                  filterStocks: _filterStocks,
+                ),
+              ).then((query) {
+                if (query != null) {
+                  setState(() {
+                    _stocks = _filterStocks(query,
+                        Provider.of<StockProvider>(context, listen: false));
+                    isSearch = true;
+                  });
+                }
+              });
             },
             icon: Visibility(
-              visible: !_stocks.isEmpty,
+              // visible: !_stocks.isEmpty,
               child: const Icon(Icons.search),
             ),
-          ),
-          IconButton(
-            onPressed: () async {
-              // await showFilterSortDialog(context);
-            },
-            icon: Visibility(
-              visible: !_stocks.isEmpty,
-              child: const Icon(Icons.filter_list),
-            ),
+            padding: EdgeInsets.only(right: 16),
           ),
         ],
         backgroundColor: primary,
@@ -87,7 +110,8 @@ class DataStockState extends State<StockPage> {
               return CustomScrollView(
                 slivers: [
                   SliverPadding(
-                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).padding.bottom),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate(
                         [
@@ -95,7 +119,8 @@ class DataStockState extends State<StockPage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 25, vertical: 8),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -113,7 +138,8 @@ class DataStockState extends State<StockPage> {
                                           'Filter 1',
                                           'Filter 2',
                                           'Filter 3'
-                                        ].map<DropdownMenuItem<String>>((String value) {
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
                                           return DropdownMenuItem<String>(
                                             value: value,
                                             child: Text(value),
@@ -133,10 +159,9 @@ class DataStockState extends State<StockPage> {
                                             selectedSort = value!;
                                           });
                                         },
-                                        items: [
-                                          'A-Z',
-                                          'Z-A'
-                                        ].map<DropdownMenuItem<String>>((String value) {
+                                        items: ['A-Z', 'Z-A']
+                                            .map<DropdownMenuItem<String>>(
+                                                (String value) {
                                           return DropdownMenuItem<String>(
                                             value: value,
                                             child: Text(value),
@@ -164,11 +189,14 @@ class DataStockState extends State<StockPage> {
                         crossAxisSpacing: 1,
                       ),
                       delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                          final stock = provider.stocks[index];
+                        (BuildContext context, int index) {
+                          final stock = isSearch
+                              ? _stocks[index]
+                              : provider.stocks[index];
                           return StockItem(stock: stock);
                         },
-                        childCount: provider.stocks.length,
+                        childCount:
+                            isSearch ? _stocks.length : provider.stocks.length,
                       ),
                     ),
                   ),
@@ -194,12 +222,11 @@ class DataStockState extends State<StockPage> {
 }
 
 class StockSearch extends SearchDelegate {
-  List<String> searchTerms = [
-    'Accu',
-    'Oli',
-    'Radiator',
-  ];
+  final StockProvider provider;
+  final List<Stock> Function(String, StockProvider) filterStocks;
 
+  // StockSearch(this.provider);
+  StockSearch(this.provider, {required this.filterStocks});
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -222,18 +249,15 @@ class StockSearch extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var item in searchTerms) {
-      if (item.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(item);
-      }
-    }
+    final List<Stock> filteredStocks =
+        query.isEmpty ? [] : filterStocks(query.toLowerCase(), provider);
+
     return ListView.builder(
-      itemCount: matchQuery.length,
+      itemCount: filteredStocks.length,
       itemBuilder: (context, index) {
-        var result = matchQuery[index];
+        final Stock result = filteredStocks[index];
         return ListTile(
-          title: Text(result),
+          title: Text(result.name),
         );
       },
     );
@@ -241,20 +265,24 @@ class StockSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var item in searchTerms) {
-      if (item.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(item);
-      }
-    }
+    final List<Stock> filteredStocks =
+        query.isEmpty ? [] : filterStocks(query.toLowerCase(), provider);
+
     return ListView.builder(
-      itemCount: matchQuery.length,
+      itemCount: filteredStocks.length,
       itemBuilder: (context, index) {
-        var result = matchQuery[index];
+        final Stock result = filteredStocks[index];
         return ListTile(
-          title: Text(result),
-        );
+            title: Text(result.name),
+            onTap: () {
+              close(context, result.name);
+            });
       },
     );
+  }
+
+  @override
+  void showResults(BuildContext context) {
+    Navigator.pop(context, query);
   }
 }
