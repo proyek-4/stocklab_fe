@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:stocklab_fe/pages/stock/edit_stock_page.dart';
 import '../models/Stock.dart';
 import 'package:flutter/widgets.dart';
 import 'bottom_sheet_modal.dart';
 import '../utils.dart';
 import 'image_loader.dart';
+import 'package:http/http.dart' as http;
 
 class StockItem extends StatelessWidget {
   final Stock stock;
 
   const StockItem({required this.stock});
+
+  Future<void> _deleteStock(BuildContext context) async {
+    try {
+      final response = await http.delete(
+        Uri.parse(url + '/api/stocks/${stock.id}'),
+      );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Item berhasil dihapus'),
+          ),
+        );
+        // Refresh halaman atau lakukan tindakan lain yang sesuai
+      } else {
+        throw Exception('Gagal menghapus item');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menghapus item: $e'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +111,62 @@ class StockItem extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              // Tambahkan ikon titik tiga di pojok kanan atas
+              PopupMenuButton<String>(
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Text('Edit'),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Text('Delete'),
+                  ),
+                ],
+                onSelected: (value) async {
+                  if (value == 'edit') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              EditStockPage(stock.id.toString())),
+                    );
+                  } else if (value == 'delete') {
+                    bool confirmDelete = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Konfirmasi Hapus'),
+                          content: Text(
+                              'Apakah Anda yakin ingin menghapus item ini?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, false); // Batal
+                              },
+                              child: Text('Batal'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(
+                                    context, true); // Konfirmasi Hapus
+                              },
+                              child: Text('Hapus'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    // Jika pengguna konfirmasi untuk menghapus
+                    if (confirmDelete == true) {
+                      _deleteStock(
+                          context); // Panggil fungsi untuk menghapus item
+                    }
+                  }
+                },
+                icon: Icon(Icons.more_vert), // Icon titik tiga
               ),
             ],
           ),
