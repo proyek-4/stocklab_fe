@@ -109,10 +109,7 @@ class DataStockState extends State<StockPage> {
             } else {
               return CustomScrollView(
                 slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).padding.bottom),
-                    sliver: SliverList(
+                  SliverList(
                       delegate: SliverChildListDelegate(
                         [
                           Column(
@@ -120,7 +117,7 @@ class DataStockState extends State<StockPage> {
                             children: [
                               Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: 25, vertical: 8),
+                                    horizontal: 25),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -178,9 +175,9 @@ class DataStockState extends State<StockPage> {
                         ],
                       ),
                     ),
-                  ),
+
                   SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.only(bottom: 30),
                     sliver: SliverGrid(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 1,

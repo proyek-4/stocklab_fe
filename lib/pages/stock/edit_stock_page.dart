@@ -6,7 +6,6 @@ import 'package:http_parser/http_parser.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/quickalert.dart';
 import '../../provider/StockProvider.dart';
-import '../../models/stock.dart'; // Import model Stock
 import '../../utils.dart';
 import '../../widgets/date_picker.dart';
 import '../../colors.dart';
