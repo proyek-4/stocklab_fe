@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stocklab_fe/pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'provider/StockProvider.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,8 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: PageView(
           children: <Widget>[
-            HomePage(),
+            // HomePage(),
+            LoginPage(),
           ],
         ),
       ),
