@@ -19,7 +19,8 @@ class _LoginPageState extends State<LoginPage> {
     final AuthService _authService =
         AuthService(); // Panggil service auth di sini
     return Scaffold(
-      body: Container(
+        body: SingleChildScrollView(
+      child: Container(
         color: primary,
         height: height,
         width: width,
@@ -32,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(bottom: 20.0),
+                      padding: EdgeInsets.only(bottom: 20.0, top: 50.0),
                       child: Image.asset(
                         'assets/icon/icon.png',
                         height: height / 7,
@@ -168,6 +169,6 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
