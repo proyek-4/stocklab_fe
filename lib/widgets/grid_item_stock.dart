@@ -82,8 +82,8 @@ class StockItem extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(top: 2),
                       child: Text(
-                        stock.name.length > 20
-                            ? '${stock.name.substring(0, 20)}...'
+                        stock.name.length > 15
+                            ? '${stock.name.substring(0, 15)}...'
                             : stock.name,
                         style: TextStyle(
                           fontSize: 20,
@@ -129,8 +129,8 @@ class StockItem extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              EditStockPage(stock.id.toString())),
+                        builder: (context) => EditStockPage(stock: stock),
+                      ),
                     );
                   } else if (value == 'delete') {
                     bool confirmDelete = await showDialog(

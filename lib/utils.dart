@@ -6,4 +6,4 @@ String formatPrice(int price) {
 }
 
 String url =
-    'http://10.0.2.2:8000';
+    'https://4143-2001-448a-3032-30a4-de2c-8afa-4499-4d55.ngrok-free.app';

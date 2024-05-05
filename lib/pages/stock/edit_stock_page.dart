@@ -9,11 +9,15 @@ import '../../provider/StockProvider.dart';
 import '../../utils.dart';
 import '../../widgets/date_picker.dart';
 import '../../colors.dart';
+import '../../models/Stock.dart';
+import '../../widgets/error_dialog.dart';
+import '../../widgets/alert_image.dart';
+
 
 class EditStockPage extends StatefulWidget {
-  final String stockId;
+  final Stock stock;
 
-  EditStockPage(this.stockId) : super();
+  EditStockPage({required this.stock}) : super();
 
   @override
   _EditStockPageState createState() => _EditStockPageState();
@@ -30,6 +34,27 @@ class _EditStockPageState extends State<EditStockPage> {
   File? _image;
   final ImagePicker picker = ImagePicker();
 
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.stock.name);
+    _priceController = TextEditingController(text: widget.stock.price.toString());
+    _quantityController = TextEditingController(text: widget.stock.quantity.toString());
+    _descriptionController = TextEditingController(text: widget.stock.description);
+    _dateController = TextEditingController(text: widget.stock.date);
+    _titleProgress = "Edit Stok Gudang";
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _quantityController.dispose();
+    _descriptionController.dispose();
+    _dateController.dispose();
+    super.dispose();
+  }
+
   Future<void> getImage(ImageSource media) async {
     var img = await picker.pickImage(source: media);
 
@@ -39,11 +64,10 @@ class _EditStockPageState extends State<EditStockPage> {
   }
 
   Future<void> _editStock() async {
-    _showProgress('Menyimpan perubahan stok...');
+    _showProgress('Memperbarui stok...');
 
     try {
-      var uri =
-          Uri.parse(url + '/api/stocks/update/${int.parse(widget.stockId)}');
+      var uri = Uri.parse(url + '/api/stocks/update/${widget.stock.id}');
       var request = http.MultipartRequest('POST', uri);
 
       request.fields.addAll({
@@ -75,10 +99,18 @@ class _EditStockPageState extends State<EditStockPage> {
         Provider.of<StockProvider>(context, listen: false).loadStocks();
         Navigator.pop(context);
       } else {
-        print('Failed to edit stock: ${response.statusCode}');
+        print('Failed to update stock: ${response.statusCode}');
+        showErrorDialog(
+          context,
+          'Failed to update stock. ${response.reasonPhrase}. Please try again.',
+        );
       }
     } catch (e) {
-      print('Error editing stock: $e');
+      print('Error updating stock: $e');
+      showErrorDialog(
+        context,
+        'Failed to update stock. $e. Please try again.',
+      );
     }
   }
 
@@ -227,23 +259,65 @@ class _EditStockPageState extends State<EditStockPage> {
                   ),
                   SizedBox(height: 20),
                   Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        getImage(ImageSource.gallery);
-                      },
-                      child: Text('Pilih Gambar'),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 10),
+                          _image != null
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.file(
+                                      File(_image!.path),
+                                      fit: BoxFit.cover,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 300,
+                                    ),
+                                  ),
+                                )
+                              : widget.stock.image != '/storage/stock/default.png'
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      url + widget.stock.image,
+                                      fit: BoxFit.cover,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 300,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                "Tidak ada gambar yang ditambahkan",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
+                              ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              myAlert(context, (ImageSource source) async {
+                                final pickedImage = await ImagePicker().pickImage(source: source);
+                                if (pickedImage != null) {
+                                  setState(() {
+                                    _image = File(pickedImage.path);
+                                  });
+                                }
+                              });
+                            },
+                            child: Text('Upload Gambar'),
+                            style: ElevatedButton.styleFrom(
+                              onPrimary: primary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  _image == null
-                      ? SizedBox.shrink()
-                      : Image.file(
-                          _image!,
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                  SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 12.0),
                     child: SizedBox(
@@ -257,7 +331,7 @@ class _EditStockPageState extends State<EditStockPage> {
                             _editStock();
                           }
                         },
-                        child: Text('Simpan Perubahan'),
+                        child: Text('Simpan'),
                         style: ElevatedButton.styleFrom(
                           primary: primary,
                           onPrimary: Colors.white,
