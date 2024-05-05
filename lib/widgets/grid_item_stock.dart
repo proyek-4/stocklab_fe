@@ -51,13 +51,13 @@ class StockItem extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black26,
-              spreadRadius: 1,
-              blurRadius: 2,
+              spreadRadius: 0.5,
+              blurRadius: 1,
             ),
           ],
         ),
@@ -66,11 +66,14 @@ class StockItem extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              ImageLoader(
-                imageUrl: imageUrl,
-                width: 70,
-                height: 70,
-                fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: ImageLoader(
+                  imageUrl: imageUrl,
+                  width: 70,
+                  height: 80,
+                  fit: BoxFit.cover,
+                ),
               ),
               SizedBox(
                 width: 20,
@@ -82,11 +85,11 @@ class StockItem extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(top: 2),
                       child: Text(
-                        stock.name.length > 15
-                            ? '${stock.name.substring(0, 15)}...'
+                        stock.name.length > 20
+                            ? '${stock.name.substring(0, 20)}...'
                             : stock.name,
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -117,11 +120,11 @@ class StockItem extends StatelessWidget {
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     value: 'edit',
-                    child: Text('Edit'),
+                    child: Text('Ubah'),
                   ),
                   PopupMenuItem(
                     value: 'delete',
-                    child: Text('Delete'),
+                    child: Text('Hapus'),
                   ),
                 ],
                 onSelected: (value) async {

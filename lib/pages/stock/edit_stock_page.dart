@@ -79,13 +79,23 @@ class _EditStockPageState extends State<EditStockPage> {
       });
 
       if (_image != null) {
-        var mimeType = 'image/jpeg';
-        var multipartFile = await http.MultipartFile.fromPath(
-          'image',
-          _image!.path,
-          contentType: MediaType.parse(mimeType),
-        );
-        request.files.add(multipartFile);
+        int maxSizeInBytes = 2 * 1024 * 1024; // 2MB (bytes)
+        if (_image!.lengthSync() <= maxSizeInBytes) {
+          var mimeType = 'image/jpeg';
+          var multipartFile = await http.MultipartFile.fromPath(
+            'image',
+            _image!.path,
+            contentType: MediaType.parse(mimeType),
+          );
+          request.files.add(multipartFile);
+        } else {
+          showErrorDialog(
+            context,
+            'Image size exceeds limit (2MB). Please try again.',
+          );
+          print('Image size exceeds limit (2MB)');
+          return;
+        }
       }
 
       var response = await request.send();
@@ -257,7 +267,6 @@ class _EditStockPageState extends State<EditStockPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
                   Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -267,7 +276,7 @@ class _EditStockPageState extends State<EditStockPage> {
                           SizedBox(height: 10),
                           _image != null
                               ? Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.only(bottom: 20),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.file(
@@ -280,7 +289,7 @@ class _EditStockPageState extends State<EditStockPage> {
                                 )
                               : widget.stock.image != '/storage/stock/default.png'
                               ? Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.only(bottom: 20),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.network(
@@ -291,13 +300,16 @@ class _EditStockPageState extends State<EditStockPage> {
                                     ),
                                   ),
                                 )
-                              : Text(
-                                "Tidak ada gambar yang ditambahkan",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
+                              : Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: Text(
+                                    "Tidak ada gambar yang ditambahkan",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black,
+                                    ),
+                                  ),
                                 ),
-                              ),
                           ElevatedButton(
                             onPressed: () async {
                               myAlert(context, (ImageSource source) async {
