@@ -25,6 +25,17 @@ class DataStockState extends State<StockPage> {
   late String _titleProgress;
   var height, width;
   late StockProvider _stockProvider;
+
+  String selectedSort = 'A-Z';
+
+  void sortStocks(List<Stock> stocks) {
+    if (selectedSort == 'A-Z') {
+      stocks.sort((a, b) => a.name.compareTo(b.name));
+    } else {
+      stocks.sort((a, b) => b.name.compareTo(a.name));
+    }
+  }
+
   bool isSearch = false;
 
   @override
@@ -38,7 +49,7 @@ class DataStockState extends State<StockPage> {
   }
 
   String selectedFilter = 'Semua';
-  String selectedSort = 'A-Z';
+  // String selectedSort = 'A-Z';
 
   Future<void> _refreshStocks() async {
     await _stockProvider.loadStocks();
@@ -53,6 +64,7 @@ class DataStockState extends State<StockPage> {
 
   @override
   Widget build(BuildContext context) {
+    StockProvider cek = Provider.of<StockProvider>(context);
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -107,75 +119,74 @@ class DataStockState extends State<StockPage> {
                 child: CircularProgressIndicator(),
               );
             } else {
+              sortStocks(provider.stocks);
               return CustomScrollView(
                 slivers: [
                   SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 25),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Visibility(
-                                      visible: !provider.stocks.isEmpty,
-                                      child: DropdownButton<String>(
-                                        value: selectedFilter,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedFilter = value!;
-                                          });
-                                        },
-                                        items: [
-                                          'Semua',
-                                          'Filter 1',
-                                          'Filter 2',
-                                          'Filter 3'
-                                        ].map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                      ),
+                    delegate: SliverChildListDelegate(
+                      [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 25),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Visibility(
+                                    visible: !provider.stocks.isEmpty,
+                                    child: DropdownButton<String>(
+                                      value: selectedFilter,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedFilter = value!;
+                                        });
+                                      },
+                                      items: [
+                                        'Semua',
+                                        'Filter 1',
+                                        'Filter 2',
+                                        'Filter 3'
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
                                     ),
-                                    SizedBox(
-                                      width: 16,
+                                  ),
+                                  SizedBox(
+                                    width: 16,
+                                  ),
+                                  Visibility(
+                                    visible: !provider.stocks.isEmpty,
+                                    child: DropdownButton<String>(
+                                      value: selectedSort,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedSort = value!;
+                                        });
+                                      },
+                                      items: ['A-Z', 'Z-A']
+                                          .map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
                                     ),
-                                    Visibility(
-                                      visible: !provider.stocks.isEmpty,
-                                      child: DropdownButton<String>(
-                                        value: selectedSort,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedSort = value!;
-                                          });
-                                        },
-                                        items: ['A-Z', 'Z-A']
-                                            .map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 8),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                            SizedBox(height: 8),
+                          ],
+                        ),
+                      ],
                     ),
-
+                  ),
                   SliverPadding(
                     padding: EdgeInsets.only(bottom: 30),
                     sliver: SliverGrid(
