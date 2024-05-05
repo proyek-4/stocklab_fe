@@ -49,6 +49,7 @@ dependencies:
   pull_to_refresh_flutter3: ^2.0.2
   shimmer: ^3.0.0
   cached_network_image: ^3.3.1
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

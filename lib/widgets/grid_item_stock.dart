@@ -6,6 +6,8 @@ import 'bottom_sheet_modal.dart';
 import '../utils.dart';
 import 'image_loader.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../provider/StockProvider.dart';
 
 class StockItem extends StatelessWidget {
   final Stock stock;
@@ -23,7 +25,7 @@ class StockItem extends StatelessWidget {
             content: Text('Item berhasil dihapus'),
           ),
         );
-        // Refresh halaman atau lakukan tindakan lain yang sesuai
+        Provider.of<StockProvider>(context, listen: false).loadStocks();
       } else {
         throw Exception('Gagal menghapus item');
       }

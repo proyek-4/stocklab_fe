@@ -1,9 +1,6 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import '../colors.dart';
 import '../models/Stock.dart';
-import '../network/StockService.dart';
 import '../widgets/grid_item_stock.dart';
 import 'stock/add_stock_page.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +17,6 @@ class StockPage extends StatefulWidget {
 
 class DataStockState extends State<StockPage> {
   List<Stock> _stocks = [];
-  late Stock _selectedStock;
-  late bool _isUpdating;
   late String _titleProgress;
   var height, width;
   late StockProvider _stockProvider;
@@ -41,7 +36,6 @@ class DataStockState extends State<StockPage> {
   @override
   void initState() {
     super.initState();
-    _isUpdating = false;
     _titleProgress = widget.title;
     Future.microtask(() {
       Provider.of<StockProvider>(context, listen: false).loadStocks();
@@ -64,7 +58,6 @@ class DataStockState extends State<StockPage> {
 
   @override
   Widget build(BuildContext context) {
-    StockProvider cek = Provider.of<StockProvider>(context);
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -189,7 +182,24 @@ class DataStockState extends State<StockPage> {
                   ),
                   SliverPadding(
                     padding: EdgeInsets.only(bottom: 30),
-                    sliver: SliverGrid(
+                    sliver: provider.stocks.isEmpty
+                        ? SliverToBoxAdapter(
+                          child: Column(
+                            children: [
+                              SizedBox(height: 20),
+                              Image.asset(
+                                "assets/icon/not_found_item.jpg",
+                                width: 300,
+                                height: 300,
+                              ),
+                              Text(
+                                'Tidak ada data yang tersedia.',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ],
+                          ),
+                        )
+                    : SliverGrid(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 1,
                         childAspectRatio: 3.5,

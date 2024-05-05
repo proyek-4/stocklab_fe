@@ -22,6 +22,8 @@ class StockProvider extends ChangeNotifier {
       // Memperbarui _stocks hanya jika data yang dimuat tidak kosong
       if (loadedStocks.isNotEmpty) {
         _stocks = loadedStocks;
+      }else{
+        resetProvider();
       }
     } catch (error) {
       print('Error loading stocks: $error');
@@ -31,6 +33,12 @@ class StockProvider extends ChangeNotifier {
       isLoading =
           false; // Memberitahu bahwa proses pengambilan data sudah selesai
     }
+  }
+
+  void resetProvider() {
+    _stocks.clear();
+    _isLoading = false;
+    notifyListeners();
   }
 
   void showErrorSnackBar(BuildContext context, String message) {

@@ -36,7 +36,7 @@ class BottomSheetModal extends StatelessWidget {
                     padding: EdgeInsets.only(top: 15, bottom: 15),
                     child: Center(
                       child: Container(
-                        height: 7,
+                        height: 5,
                         width: 40,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
