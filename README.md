@@ -1,3 +1,11 @@
+## Anggota : 
+### Ketua : Alfien Sukma Prawira
+### Anggota 1 : Adrian Eka Saputra
+### Anggota 2 : Aqila Ghifari Wandana
+
+## Konfigurasi Front-end:
+- Jika menggunakan Android Studio (Emulator), url pada utils.dart di set url = 'http://10.0.2.2:8000';
+
 # stocklab_fe
 
 A new Flutter project.
