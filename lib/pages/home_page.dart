@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stocklab_fe/colors.dart';
 import 'stock_page.dart';
-import 'package:stocklab_fe/provider/LoginProvider.dart';
+import 'package:stocklab_fe/provider/UserProvider.dart';
 
 // ignore: must_be_immutable
 class HomePage extends StatelessWidget {
@@ -23,8 +23,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var loginProvider = Provider.of<LoginProvider>(context);
-    var userData = loginProvider.userData;
+    var userProvider = Provider.of<UserProvider>(context);
+    var userData = userProvider.userData;
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(

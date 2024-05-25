@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:stocklab_fe/colors.dart';
 import 'package:stocklab_fe/network/AuthService.dart';
 import 'package:stocklab_fe/pages/home_page.dart';
-import 'package:stocklab_fe/provider/LoginProvider.dart';
+import 'package:stocklab_fe/provider/UserProvider.dart';
 
 class LoginForm extends StatelessWidget {
   final TextEditingController emailController;
@@ -109,16 +109,16 @@ class LoginForm extends StatelessWidget {
           SizedBox(height: 16.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0),
-            child: Consumer<LoginProvider>(
-              builder: (context, loginProvider, _) {
+            child: Consumer<UserProvider>(
+              builder: (context, userProvider, _) {
                 return ElevatedButton(
                   onPressed: () async {
-                    await loginProvider.login(
+                    await userProvider.login(
                       emailController.text,
                       passwordController.text,
                     );
 
-                    if (loginProvider.isLoggedIn) {
+                    if (userProvider.isLoggedIn) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => HomePage()),
@@ -143,7 +143,7 @@ class LoginForm extends StatelessWidget {
                       );
                     }
                   },
-                  child: loginProvider.isLoading
+                  child: userProvider.isLoading
                       ? CircularProgressIndicator() // Tampilkan indicator loading jika sedang loading
                       : Text(
                           'Login',

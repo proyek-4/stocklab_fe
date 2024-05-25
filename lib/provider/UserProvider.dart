@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stocklab_fe/network/AuthService.dart';
 
-class LoginProvider extends ChangeNotifier {
+class UserProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isLoggedIn = false;
   bool get isLoggedIn => _isLoggedIn;
