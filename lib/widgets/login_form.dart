@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stocklab_fe/colors.dart';
 import 'package:stocklab_fe/network/LoginService.dart';
 import 'package:stocklab_fe/pages/home_page.dart';
+import 'package:stocklab_fe/provider/LoginProvider.dart';
 
 class LoginForm extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
-  final AuthService authService;
+  // final AuthService authService;
   final double height;
   final double width;
 
   LoginForm({
     required this.emailController,
     required this.passwordController,
-    required this.authService,
+    // required this.authService,
     required this.height,
     required this.width,
   });
@@ -107,50 +109,58 @@ class LoginForm extends StatelessWidget {
           SizedBox(height: 16.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                bool success = await authService.login(
-                  emailController.text,
-                  passwordController.text,
-                );
-                if (success) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Login Gagal'),
-                        content: Text('Email atau password salah.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('OK'),
-                          ),
-                        ],
+            child: Consumer<LoginProvider>(
+              builder: (context, loginProvider, _) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    await loginProvider.login(
+                      emailController.text,
+                      passwordController.text,
+                    );
+
+                    if (loginProvider.isLoggedIn) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
                       );
-                    },
-                  );
-                }
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('Login Gagal'),
+                            content: Text('Email atau password salah.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                  child: loginProvider.isLoading
+                      ? CircularProgressIndicator() // Tampilkan indicator loading jika sedang loading
+                      : Text(
+                          'Login',
+                          style: TextStyle(color: primary, fontSize: 18),
+                        ),
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(secondary),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    minimumSize: MaterialStateProperty.all<Size>(
+                      Size(double.infinity, 56),
+                    ),
+                  ),
+                );
               },
-              child: Text(
-                'Login',
-                style: TextStyle(color: primary, fontSize: 18),
-              ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(secondary),
-                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                  EdgeInsets.symmetric(vertical: 14),
-                ),
-                minimumSize: MaterialStateProperty.all<Size>(
-                  Size(double.infinity, 56),
-                ),
-              ),
             ),
           ),
           Center(
