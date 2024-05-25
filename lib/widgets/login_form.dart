@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stocklab_fe/colors.dart';
-import 'package:stocklab_fe/network/LoginService.dart';
+import 'package:stocklab_fe/network/AuthService.dart';
 import 'package:stocklab_fe/pages/home_page.dart';
 import 'package:stocklab_fe/provider/LoginProvider.dart';
 

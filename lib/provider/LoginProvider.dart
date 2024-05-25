@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stocklab_fe/network/LoginService.dart';
+import 'package:stocklab_fe/network/AuthService.dart';
 
 class LoginProvider extends ChangeNotifier {
   bool _isLoading = false;

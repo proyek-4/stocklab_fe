@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stocklab_fe/colors.dart';
-import 'package:stocklab_fe/network/LoginService.dart';
+import 'package:stocklab_fe/network/AuthService.dart';
 import 'package:stocklab_fe/pages/home_page.dart';
 import 'package:stocklab_fe/widgets/register_form.dart';
 import 'package:stocklab_fe/widgets/login_form.dart';
@@ -64,7 +64,6 @@ class _LoginPageState extends State<LoginPage>
                   child: LoginForm(
                     emailController: _emailController,
                     passwordController: _passwordController,
-                    // authService: _authService,
                     height: height,
                     width: width,
                   ),
