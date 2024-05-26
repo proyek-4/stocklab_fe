@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stocklab_fe/colors.dart';
 import 'stock_page.dart';
+import 'record_page.dart';
 
 // ignore: must_be_immutable
 class HomePage extends StatelessWidget {
@@ -14,7 +15,7 @@ class HomePage extends StatelessWidget {
   ];
   List titles = [
     "Stok Gudang",
-    "Riwayat",
+    "Pencatatan",
     "Pengaturan",
     "Profil Akun",
   ];
@@ -86,6 +87,11 @@ class HomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => StockPage()),
+                        );
+                      }else if(titles[index] == "Pencatatan"){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RecordPage()),
                         );
                       }
                     },

@@ -1,5 +1,5 @@
 class Stock {
-  final int id, price, quantity;
+  final int id, price, quantity, warehouse_id;
   final String name, description, image, date;
 
   Stock(
@@ -9,7 +9,8 @@ class Stock {
       this.name = '',
       this.description = '',
       this.image = '',
-      this.date = ''});
+      this.date = '',
+      this.warehouse_id = 0,});
 
   factory Stock.fromJson(Map<String, dynamic> json) {
     return Stock(
@@ -20,6 +21,7 @@ class Stock {
       description: json['description'] ?? '-',
       image: json['image'],
       date: json['date'],
+      warehouse_id: json['warehouse_id'],
     );
   }
 }

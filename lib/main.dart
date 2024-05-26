@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:stocklab_fe/pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'provider/StockProvider.dart';
+import 'provider/RecordProvider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => StockProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<StockProvider>(
+          create: (context) => StockProvider(),
+        ),
+        ChangeNotifierProvider<RecordProvider>(
+          create: (context) => RecordProvider(),
+        ),
+      ],
       child: MyApp(),
     ),
   );

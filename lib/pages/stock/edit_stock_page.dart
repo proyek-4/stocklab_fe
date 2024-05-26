@@ -79,7 +79,7 @@ class _EditStockPageState extends State<EditStockPage> {
       });
 
       if (_image != null) {
-        int maxSizeInBytes = 2 * 1024 * 1024; // 2MB (bytes)
+        int maxSizeInBytes = 3 * 1024 * 1024; // 3MB (bytes)
         if (_image!.lengthSync() <= maxSizeInBytes) {
           var mimeType = 'image/jpeg';
           var multipartFile = await http.MultipartFile.fromPath(
