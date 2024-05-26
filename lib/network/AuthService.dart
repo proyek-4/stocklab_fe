@@ -11,7 +11,7 @@ class AuthService {
       final response = await http.post(
         Uri.parse(url + '/api/login'),
         body: {
-          'email': email,
+          'username_or_email': email,
           'password': password,
         },
       );
@@ -45,10 +45,8 @@ class AuthService {
       );
 
       print('Register Response: ${response.body}');
-
-      Map<String, dynamic> data = json.decode(response.body);
-
       if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.body);
         if (data.containsKey('response') && data['response'] == 422) {
           throw Exception(data['message']);
         } else if (data.containsKey('success') && data['success'] == true) {
@@ -57,7 +55,7 @@ class AuthService {
           throw Exception('Unknown error occurred');
         }
       } else {
-        throw Exception(data['message'] ?? 'Failed to register');
+        throw Exception('Failed to register');
       }
     } catch (e) {
       print('Error logging in: $e');
