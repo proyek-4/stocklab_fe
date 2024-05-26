@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stocklab_fe/pages/login_page.dart';
-import 'pages/home_page.dart';
+import 'package:stocklab_fe/provider/UserProvider.dart';
 import 'provider/StockProvider.dart';
 import 'provider/RecordProvider.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +14,9 @@ void main() {
         ),
         ChangeNotifierProvider<RecordProvider>(
           create: (context) => RecordProvider(),
+        ),
+        ChangeNotifierProvider<UserProvider>(
+          create: (context) => UserProvider(),
         ),
       ],
       child: MyApp(),
