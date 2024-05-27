@@ -16,11 +16,19 @@ class HomePage extends StatelessWidget {
     "assets/icon/sales.png",
     "assets/icon/user.png",
   ];
+
+  List<IconData> icons = [
+    Icons.article, // Daftar Barang
+    Icons.note_alt, // Pencatatan
+    Icons.sell, // Penjualan
+    Icons.book, // Modul Pembelajaran
+  ];
+
   List titles = [
-    "Stok Gudang",
+    "Daftar Barang",
     "Pencatatan",
     "Penjualan",
-    "Profil Akun",
+    "Modul Pembelajaran",
   ];
 
   @override
@@ -30,7 +38,8 @@ class HomePage extends StatelessWidget {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Container(
+        body: SingleChildScrollView(
+      child: Container(
         color: primary,
         height: height,
         width: width,
@@ -67,86 +76,104 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                  topRight: Radius.circular(50),
-                ),
-              ),
-              height: height * 0.75,
-              width: width,
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.1,
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
-                ),
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: imgData.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      if (titles[index] == "Stok Gudang") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => StockPage()),
-                        );
-                      } else if (titles[index] == "Pencatatan") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => RecordPage()),
-                        );
-                      } else if (titles[index] == "Penjualan") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SalesPage()),
-                        );
-                      }
-                    },
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            spreadRadius: 1,
-                            blurRadius: 6,
-                          ),
-                        ],
+            Expanded(
+              child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
+                    ),
+                  ),
+                  height: height * 0.75,
+                  width: width,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 50, left: 10, right: 10),
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 1.5,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 0,
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: imgData.length,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset(
-                              imgData[index],
-                              width: 70,
+                            InkWell(
+                              onTap: () {
+                                if (titles[index] == "Daftar Barang") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => StockPage()),
+                                  );
+                                } else if (titles[index] == "Pencatatan") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RecordPage()),
+                                  );
+                                } else if (titles[index] == "Penjualan") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SalesPage()),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      spreadRadius: 1,
+                                      blurRadius: 6,
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Icon(
+                                        icons[index],
+                                        size: 55,
+                                        color: Colors
+                                            .blue, // Ubah warna ikon sesuai keinginan Anda
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
+                            SizedBox(height: 5),
                             Text(
                               titles[index],
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ],
-                        ),
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  )),
+            )
           ],
         ),
       ),
-    );
+    ));
   }
 }

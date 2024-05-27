@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:stocklab_fe/colors.dart';
 import 'package:stocklab_fe/network/AuthService.dart';
 import 'package:stocklab_fe/pages/home_page.dart';
+import 'package:stocklab_fe/pages/main_page.dart';
 import 'package:stocklab_fe/provider/UserProvider.dart';
 
 class LoginForm extends StatelessWidget {
@@ -121,7 +122,7 @@ class LoginForm extends StatelessWidget {
                     if (userProvider.isLoggedIn) {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
+                        MaterialPageRoute(builder: (context) => MainPage()),
                       );
                     } else {
                       showDialog(
