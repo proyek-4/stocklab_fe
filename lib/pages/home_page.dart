@@ -4,6 +4,7 @@ import 'package:stocklab_fe/colors.dart';
 import 'stock_page.dart';
 import 'package:stocklab_fe/provider/UserProvider.dart';
 import 'record_page.dart';
+import 'sales_page.dart';
 
 // ignore: must_be_immutable
 class HomePage extends StatelessWidget {
@@ -12,13 +13,13 @@ class HomePage extends StatelessWidget {
   List imgData = [
     "assets/icon/stock.png",
     "assets/icon/history.png",
-    "assets/icon/setting.png",
+    "assets/icon/sales.png",
     "assets/icon/user.png",
   ];
   List titles = [
     "Stok Gudang",
     "Pencatatan",
-    "Pengaturan",
+    "Penjualan",
     "Profil Akun",
   ];
 
@@ -98,6 +99,11 @@ class HomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => RecordPage()),
+                        );
+                      } else if (titles[index] == "Penjualan") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SalesPage()),
                         );
                       }
                     },
