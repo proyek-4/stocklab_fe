@@ -9,7 +9,7 @@ import '../provider/StockProvider.dart';
 class StockPage extends StatefulWidget {
   StockPage() : super();
 
-  final String title = "Stok Gudang";
+  final String title = "Daftar Barang";
 
   @override
   DataStockState createState() => DataStockState();

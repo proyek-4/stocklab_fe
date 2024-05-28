@@ -39,10 +39,10 @@ class _LoginPageState extends State<LoginPage>
       body: Column(
         children: [
           Container(
-            // color: primary,
+            padding: EdgeInsets.only(top: 30),
             decoration: BoxDecoration(
               color: primary,
-              // borderRadius: BorderRadius.circular(30),
+              // borderRadius:   BorderRadius.circular(30),
             ),
             child: TabBar(
               controller: _tabController,
