@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../colors.dart';
 import '../models/Stock.dart';
 import '../widgets/grid_item_sales.dart';
-import 'stock/add_stock_page.dart';
+import 'sales/sales_detail_page.dart';
 import 'package:provider/provider.dart';
 import '../provider/StockProvider.dart';
 
@@ -47,8 +47,9 @@ class DataStockState extends State<SalesPage> {
 
     for (final stock in stocks) {
       if (stock.selectedQuantity > stock.quantity) {
-        messages.add(
-            'Kuantitas untuk barang ${stock.name} tidak mencukupi. Anda memilih ${stock.selectedQuantity} tetapi stok hanya ${stock.quantity}.');
+        messages.add('Kuantitas untuk barang ${stock.name} tidak mencukupi. '
+            'Anda memilih ${stock.selectedQuantity} tetapi stok hanya '
+            '${stock.quantity}.');
       }
     }
 
@@ -79,12 +80,14 @@ class DataStockState extends State<SalesPage> {
     if (overQuantityStocks.isNotEmpty) {
       _showQuantityAlert(overQuantityStocks);
     } else {
+      final List<Stock> selectedStocks = _stocks.where((stock) => stock.selectedQuantity > 0).toList();
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => AddStockPage()),
+        MaterialPageRoute(builder: (context) => SalesDetailPage(selectedStocks: selectedStocks)),
       );
     }
   }
+
 
   String selectedFilter = 'Semua';
   // String selectedSort = 'A-Z';
@@ -98,6 +101,10 @@ class DataStockState extends State<SalesPage> {
         .where(
             (stock) => stock.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
+  }
+
+  bool hasInputQuantities() {
+    return _stocks.any((stock) => stock.selectedQuantity > 0);
   }
 
   @override
@@ -276,12 +283,14 @@ class DataStockState extends State<SalesPage> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primary,
-        tooltip: 'Kirim',
-        onPressed: _checkQuantities,
-        child: const Icon(Icons.arrow_right_alt, color: Colors.white, size: 28),
-      ),
+      floatingActionButton: hasInputQuantities()
+      ? FloatingActionButton(
+          backgroundColor: primary,
+          tooltip: 'Kirim',
+          onPressed: _checkQuantities,
+          child: const Icon(Icons.arrow_right_alt, color: Colors.white, size: 28),
+        )
+      : null,
     );
   }
 }

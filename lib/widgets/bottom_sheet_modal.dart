@@ -84,7 +84,13 @@ class BottomSheetModal extends StatelessWidget {
                             ),
                             SizedBox(height: 10),
                             Text(
-                              'Harga : ${formatPrice(stock.price)}',
+                              'Harga Jual : ${formatPrice(stock.price)}',
+                              style: TextStyle(
+                                  fontSize: 15, color: Colors.grey[600]),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Harga Modal : ${formatPrice(stock.cost)}',
                               style: TextStyle(
                                   fontSize: 15, color: Colors.grey[600]),
                             ),
