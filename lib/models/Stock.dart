@@ -3,7 +3,6 @@ class Stock {
   final String name, description, image, date;
   int selectedQuantity;
 
-
   Stock(
       {this.id = 0,
       this.price = 0,

@@ -20,7 +20,6 @@ class _SalesDetailItemState extends State<SalesDetailItem> {
   double totalPrice = 0;
   double totalCost = 0;
 
-
   @override
   void initState() {
     super.initState();
@@ -58,7 +57,6 @@ class _SalesDetailItemState extends State<SalesDetailItem> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Box for the item name
             Container(
               padding: EdgeInsets.only(
                 bottom: 10,
@@ -101,9 +99,9 @@ class _SalesDetailItemState extends State<SalesDetailItem> {
                             padding: EdgeInsets.only(top: 0),
                             child: Text(
                               'Qty : $selectedQuantity',
-                              style: TextStyle(
-                                fontSize: 13,
-                              ),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                ),
                             ),
                           ),
                         ],
