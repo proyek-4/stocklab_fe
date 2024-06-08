@@ -27,6 +27,7 @@ class _EditStockPageState extends State<EditStockPage> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
+  TextEditingController _costController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   late String _titleProgress;
 
@@ -38,6 +39,7 @@ class _EditStockPageState extends State<EditStockPage> {
     super.initState();
     _nameController = TextEditingController(text: widget.stock.name);
     _priceController = TextEditingController(text: widget.stock.price.toString());
+    _costController = TextEditingController(text: widget.stock.cost.toString());
     _descriptionController = TextEditingController(text: widget.stock.description);
     _dateController = TextEditingController(text: widget.stock.date);
     _titleProgress = "Edit Stok Gudang";
@@ -47,6 +49,7 @@ class _EditStockPageState extends State<EditStockPage> {
   void dispose() {
     _nameController.dispose();
     _priceController.dispose();
+    _costController.dispose();
     _descriptionController.dispose();
     _dateController.dispose();
     super.dispose();
@@ -70,8 +73,11 @@ class _EditStockPageState extends State<EditStockPage> {
       request.fields.addAll({
         'name': _nameController.text,
         'price': _priceController.text,
+        'cost': _costController.text,
         'description': _descriptionController.text,
         'date': _dateController.text,
+        'warehouse_id' : '1',
+        'quantity' : widget.stock.quantity.toString(),
       });
 
       if (_image != null) {
@@ -208,7 +214,30 @@ class _EditStockPageState extends State<EditStockPage> {
                       controller: _priceController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Harga',
+                        labelText: 'Harga Jual',
+                        labelStyle: TextStyle(color: Colors.black),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: primary),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Kolom harus diisi!';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Harga harus berupa angka!';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: TextFormField(
+                      controller: _costController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Harga Modal',
                         labelStyle: TextStyle(color: Colors.black),
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: primary),

@@ -25,6 +25,7 @@ class _AddStockPageState extends State<AddStockPage> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
+  TextEditingController _costController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   late String _titleProgress;
 
@@ -49,9 +50,11 @@ class _AddStockPageState extends State<AddStockPage> {
       request.fields.addAll({
         'name': _nameController.text,
         'price': _priceController.text,
-        'quantity': '0',
+        'cost': _costController.text,
         'description': _descriptionController.text,
         'date': _dateController.text,
+        'quantity' : '0',
+        'warehouse_id' : '1',
       });
 
       if (_image != null) {
@@ -67,9 +70,8 @@ class _AddStockPageState extends State<AddStockPage> {
         } else {
           showErrorDialog(
             context,
-            'Image size exceeds limit (2MB). Please try again.',
+            'Image size exceeds limit (3MB). Please try again.',
           );
-          print('Image size exceeds limit (2MB)');
           return;
         }
       }
@@ -88,7 +90,7 @@ class _AddStockPageState extends State<AddStockPage> {
         print('Failed to add stock: ${response.statusCode}');
         showErrorDialog(
           context,
-          'Failed to add stock. ${response.reasonPhrase}. Please try again.',
+          'Failed to add stock. ${response.reasonPhrase}. Please try again. WOY',
         );
       }
     } catch (e) {
@@ -190,7 +192,28 @@ class _AddStockPageState extends State<AddStockPage> {
                       keyboardType: TextInputType.number,
                       cursorColor: Colors.black,
                       decoration: InputDecoration(
-                        labelText: 'Harga',
+                        labelText: 'Harga Jual',
+                        labelStyle: TextStyle(color: Colors.black),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: primary),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Kolom harus diisi!';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: TextFormField(
+                      controller: _costController,
+                      keyboardType: TextInputType.number,
+                      cursorColor: Colors.black,
+                      decoration: InputDecoration(
+                        labelText: 'Harga Modal',
                         labelStyle: TextStyle(color: Colors.black),
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: primary),
