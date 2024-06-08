@@ -90,7 +90,7 @@ class _AddStockPageState extends State<AddStockPage> {
         print('Failed to add stock: ${response.statusCode}');
         showErrorDialog(
           context,
-          'Failed to add stock. ${response.reasonPhrase}. Please try again. WOY',
+          'Failed to add stock. ${response.reasonPhrase}. Please try again.',
         );
       }
     } catch (e) {
