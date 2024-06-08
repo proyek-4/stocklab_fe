@@ -20,40 +20,57 @@ class DataStockState extends State<StockPage> {
   late String _titleProgress;
   var height, width;
   late StockProvider _stockProvider;
-
-  String selectedSort = 'A-Z';
-
-  void sortStocks(List<Stock> stocks) {
-    if (selectedSort == 'A-Z') {
-      stocks.sort((a, b) => a.name.compareTo(b.name));
-    } else {
-      stocks.sort((a, b) => b.name.compareTo(a.name));
-    }
-  }
-
   bool isSearch = false;
+  String searchQuery = '';
+
+  String selectedSort = 'Ascending';
+  String selectedFilter = 'Nama';
 
   @override
   void initState() {
     super.initState();
     _titleProgress = widget.title;
     Future.microtask(() {
-      Provider.of<StockProvider>(context, listen: false).loadStocks();
+      _stockProvider = Provider.of<StockProvider>(context, listen: false);
+      _stockProvider.loadStocks();
     });
   }
-
-  String selectedFilter = 'Semua';
-  // String selectedSort = 'A-Z';
 
   Future<void> _refreshStocks() async {
     await _stockProvider.loadStocks();
   }
 
-  List<Stock> _filterStocks(String query, StockProvider provider) {
-    return provider.stocks
-        .where(
-            (stock) => stock.name.toLowerCase().contains(query.toLowerCase()))
-        .toList();
+  List<Stock> _filterStocks(String filter, List<Stock> stocks) {
+    switch (filter) {
+      case 'Nama':
+        stocks.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case 'Quantity':
+        stocks.sort((a, b) => a.quantity.compareTo(b.quantity));
+        break;
+      case 'Harga Modal':
+        stocks.sort((a, b) => a.cost.compareTo(b.cost));
+        break;
+      case 'Harga Jual':
+        stocks.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 'Tanggal':
+        stocks.sort((a, b) => a.date.compareTo(b.date));
+        break;
+      default:
+        // Default case if 'Semua' or unknown filter
+        break;
+    }
+    if (selectedSort == 'Descending') {
+      stocks = stocks.reversed.toList();
+    }
+    if (isSearch == true) {
+      return stocks
+          .where((stock) =>
+              stock.name.toLowerCase().contains(searchQuery.toLowerCase()))
+          .toList();
+    }
+    return stocks;
   }
 
   @override
@@ -81,22 +98,26 @@ class DataStockState extends State<StockPage> {
                 context: context,
                 delegate: StockSearch(
                   Provider.of<StockProvider>(context, listen: false),
-                  filterStocks: _filterStocks,
+                  filterStocks: (query, provider) => provider.stocks
+                      .where((stock) => stock.name
+                          .toLowerCase()
+                          .contains(query.toLowerCase()))
+                      .toList(),
                 ),
               ).then((query) {
                 if (query != null) {
                   setState(() {
-                    _stocks = _filterStocks(query,
-                        Provider.of<StockProvider>(context, listen: false));
+                    searchQuery = query;
+                    _stocks = _filterStocks(
+                        selectedFilter,
+                        Provider.of<StockProvider>(context, listen: false)
+                            .stocks);
                     isSearch = true;
                   });
                 }
               });
             },
-            icon: Visibility(
-              // visible: !_stocks.isEmpty,
-              child: const Icon(Icons.search),
-            ),
+            icon: const Icon(Icons.search),
             padding: EdgeInsets.only(right: 16),
           ),
         ],
@@ -112,7 +133,7 @@ class DataStockState extends State<StockPage> {
                 child: CircularProgressIndicator(),
               );
             } else {
-              sortStocks(provider.stocks);
+              _stocks = _filterStocks(selectedFilter, provider.stocks);
               return CustomScrollView(
                 slivers: [
                   SliverList(
@@ -133,13 +154,16 @@ class DataStockState extends State<StockPage> {
                                       onChanged: (value) {
                                         setState(() {
                                           selectedFilter = value!;
+                                          _stocks = _filterStocks(
+                                              selectedFilter, provider.stocks);
                                         });
                                       },
                                       items: [
-                                        'Semua',
-                                        'Filter 1',
-                                        'Filter 2',
-                                        'Filter 3'
+                                        'Nama',
+                                        'Quantity',
+                                        'Harga Modal',
+                                        'Harga Jual',
+                                        'Tanggal'
                                       ].map<DropdownMenuItem<String>>(
                                           (String value) {
                                         return DropdownMenuItem<String>(
@@ -159,9 +183,11 @@ class DataStockState extends State<StockPage> {
                                       onChanged: (value) {
                                         setState(() {
                                           selectedSort = value!;
+                                          _stocks = _filterStocks(
+                                              selectedFilter, provider.stocks);
                                         });
                                       },
-                                      items: ['A-Z', 'Z-A']
+                                      items: ['Ascending', 'Descending']
                                           .map<DropdownMenuItem<String>>(
                                               (String value) {
                                         return DropdownMenuItem<String>(
@@ -184,39 +210,39 @@ class DataStockState extends State<StockPage> {
                     padding: EdgeInsets.only(bottom: 30),
                     sliver: provider.stocks.isEmpty
                         ? SliverToBoxAdapter(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 20),
-                              Image.asset(
-                                "assets/icon/not_found_item.jpg",
-                                width: 300,
-                                height: 300,
-                              ),
-                              Text(
-                                'Tidak ada data yang tersedia.',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ],
+                            child: Column(
+                              children: [
+                                SizedBox(height: 20),
+                                Image.asset(
+                                  "assets/icon/not_found_item.jpg",
+                                  width: 300,
+                                  height: 300,
+                                ),
+                                Text(
+                                  'Tidak ada data yang tersedia.',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          )
+                        : SliverGrid(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              childAspectRatio: 3.5,
+                              mainAxisSpacing: 1,
+                              crossAxisSpacing: 1,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                final stock = _stocks[index];
+                                return StockItem(stock: stock);
+                              },
+                              childCount: isSearch
+                                  ? _stocks.length
+                                  : provider.stocks.length,
+                            ),
                           ),
-                        )
-                    : SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        childAspectRatio: 3.5,
-                        mainAxisSpacing: 1,
-                        crossAxisSpacing: 1,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          final stock = isSearch
-                              ? _stocks[index]
-                              : provider.stocks[index];
-                          return StockItem(stock: stock);
-                        },
-                        childCount:
-                            isSearch ? _stocks.length : provider.stocks.length,
-                      ),
-                    ),
                   ),
                 ],
               );
@@ -243,7 +269,6 @@ class StockSearch extends SearchDelegate {
   final StockProvider provider;
   final List<Stock> Function(String, StockProvider) filterStocks;
 
-  // StockSearch(this.provider);
   StockSearch(this.provider, {required this.filterStocks});
   @override
   List<Widget> buildActions(BuildContext context) {
