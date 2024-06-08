@@ -42,147 +42,192 @@ class HomePage extends StatelessWidget {
     width = MediaQuery.of(context).size.width;
     return Scaffold(
         body: SingleChildScrollView(
-      child: Container(
-        color: primary,
-        height: height,
-        width: width,
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(),
-              height: height * 0.25,
-              width: width,
-              child: Padding(
-                padding: EdgeInsets.only(top: 40, left: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+      children: [
+        Container(
+            color: primary,
+            height: height,
+            width: width,
+            child: Stack(
+              children: [
+                Column(
                   children: [
-                    Text(
-                      'StockLab',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 50),
-                    userData != null
-                        ? Text(
-                            'Halo, ${userData['name']}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 23,
-                            ),
-                          )
-                        : SizedBox(),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50),
-                    ),
-                  ),
-                  height: height * 0.75,
-                  width: width,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 50, left: 10, right: 10),
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 1.3,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 0,
-                      ),
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: titles.length,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                    Container(
+                      decoration: BoxDecoration(),
+                      height: height * 0.4,
+                      width: width,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 40, left: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            InkWell(
-                              onTap: () {
-                                if (titles[index] == "Daftar Barang") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => StockPage()),
-                                  );
-                                } else if (titles[index] == "Pencatatan") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RecordPage()),
-                                  );
-                                } else if (titles[index] == "Penjualan") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SalesPage()),
-                                  );
-                                } else if (titles[index] == "Stok Ulang") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RestockPage()),
-                                  );
-                                }
-                              },
-                              child: Container(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      spreadRadius: 1,
-                                      blurRadius: 6,
+                            Text(
+                              'StockLab',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 50),
+                            userData != null
+                                ? Text(
+                                    'Halo, ${userData['name']}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 23,
+                                    ),
+                                  )
+                                : SizedBox(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(50),
+                              topRight: Radius.circular(50),
+                            ),
+                          ),
+                          height: height * 0.6,
+                          width: width,
+                          child: Padding(
+                            padding:
+                                EdgeInsets.only(top: 50, left: 10, right: 10),
+                            child: GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 1.3,
+                                mainAxisSpacing: 15,
+                                crossAxisSpacing: 0,
+                              ),
+                              shrinkWrap: true,
+                              physics: ScrollPhysics(),
+                              itemCount: titles.length,
+                              itemBuilder: (context, index) {
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        if (titles[index] == "Daftar Barang") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    StockPage()),
+                                          );
+                                        } else if (titles[index] ==
+                                            "Pencatatan") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RecordPage()),
+                                          );
+                                        } else if (titles[index] ==
+                                            "Penjualan") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SalesPage()),
+                                          );
+                                        } else if (titles[index] ==
+                                            "Stok Ulang") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RestockPage()),
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              spreadRadius: 1,
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Icon(
+                                                icons[index],
+                                                size: 55,
+                                                color: Colors
+                                                    .blue, // Ubah warna ikon sesuai keinginan Anda
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      titles[index],
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ],
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(
-                                        icons[index],
-                                        size: 55,
-                                        color: Colors
-                                            .blue, // Ubah warna ikon sesuai keinginan Anda
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                );
+                              },
                             ),
-                            SizedBox(height: 5),
-                            Text(
-                              titles[index],
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        );
-                      },
+                          )),
                     ),
-                  )),
-            )
-          ],
-        ),
-      ),
-    ));
+                  ],
+                ),
+                Positioned(
+                  top: height * 0.33,
+                  left: (width - 350) / 2,
+                  child: Container(
+                    width: 350,
+                    height: 70,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                          ),
+                        ]),
+                    child: Center(
+                      child: Text(
+                        "Special Container",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )),
+        SizedBox(height: 50),
+      ],
+    )));
   }
 }

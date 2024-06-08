@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stocklab_fe/pages/login_page.dart';
+import 'package:stocklab_fe/pages/main_page.dart';
 import 'package:stocklab_fe/provider/UserProvider.dart';
 import 'provider/StockProvider.dart';
 import 'provider/RecordProvider.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
           children: <Widget>[
             // HomePage(),
             LoginPage(),
+            // MainPage()
           ],
         ),
       ),
