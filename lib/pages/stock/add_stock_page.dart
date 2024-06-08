@@ -25,7 +25,6 @@ class _AddStockPageState extends State<AddStockPage> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
-  TextEditingController _quantityController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   late String _titleProgress;
 
@@ -50,7 +49,7 @@ class _AddStockPageState extends State<AddStockPage> {
       request.fields.addAll({
         'name': _nameController.text,
         'price': _priceController.text,
-        'quantity': _quantityController.text,
+        'quantity': '0',
         'description': _descriptionController.text,
         'date': _dateController.text,
       });
@@ -110,7 +109,6 @@ class _AddStockPageState extends State<AddStockPage> {
   _clearValues() {
     _nameController.clear();
     _priceController.clear();
-    _quantityController.clear();
     _descriptionController.clear();
     _dateController.clear();
   }
@@ -209,30 +207,8 @@ class _AddStockPageState extends State<AddStockPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: TextFormField(
-                      controller: _quantityController,
-                      cursorColor: Colors.black,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Stok',
-                        labelStyle: TextStyle(color: Colors.black),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: primary),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Kolom harus diisi!';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: TextFormField(
                       controller: _descriptionController,
                       cursorColor: Colors.black,
-                      maxLines: 3,
                       decoration: InputDecoration(
                         labelText: 'Deskripsi',
                         labelStyle: TextStyle(color: Colors.black),

@@ -27,7 +27,6 @@ class _EditStockPageState extends State<EditStockPage> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
-  TextEditingController _quantityController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   late String _titleProgress;
 
@@ -39,7 +38,6 @@ class _EditStockPageState extends State<EditStockPage> {
     super.initState();
     _nameController = TextEditingController(text: widget.stock.name);
     _priceController = TextEditingController(text: widget.stock.price.toString());
-    _quantityController = TextEditingController(text: widget.stock.quantity.toString());
     _descriptionController = TextEditingController(text: widget.stock.description);
     _dateController = TextEditingController(text: widget.stock.date);
     _titleProgress = "Edit Stok Gudang";
@@ -49,7 +47,6 @@ class _EditStockPageState extends State<EditStockPage> {
   void dispose() {
     _nameController.dispose();
     _priceController.dispose();
-    _quantityController.dispose();
     _descriptionController.dispose();
     _dateController.dispose();
     super.dispose();
@@ -73,7 +70,6 @@ class _EditStockPageState extends State<EditStockPage> {
       request.fields.addAll({
         'name': _nameController.text,
         'price': _priceController.text,
-        'quantity': _quantityController.text,
         'description': _descriptionController.text,
         'date': _dateController.text,
       });
@@ -133,7 +129,6 @@ class _EditStockPageState extends State<EditStockPage> {
   _clearValues() {
     _nameController.clear();
     _priceController.clear();
-    _quantityController.clear();
     _descriptionController.clear();
     _dateController.clear();
   }
@@ -225,29 +220,6 @@ class _EditStockPageState extends State<EditStockPage> {
                         }
                         if (double.tryParse(value) == null) {
                           return 'Harga harus berupa angka!';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: TextFormField(
-                      controller: _quantityController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Jumlah',
-                        labelStyle: TextStyle(color: Colors.black),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: primary),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Kolom harus diisi!';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Jumlah harus berupa angka!';
                         }
                         return null;
                       },

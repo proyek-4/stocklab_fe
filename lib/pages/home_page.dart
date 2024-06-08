@@ -5,6 +5,7 @@ import 'stock_page.dart';
 import 'package:stocklab_fe/provider/UserProvider.dart';
 import 'record_page.dart';
 import 'sales_page.dart';
+import 'restock_page.dart';
 
 // ignore: must_be_immutable
 class HomePage extends StatelessWidget {
@@ -21,6 +22,7 @@ class HomePage extends StatelessWidget {
     Icons.article, // Daftar Barang
     Icons.note_alt, // Pencatatan
     Icons.sell, // Penjualan
+    Icons.add_business_outlined,
     Icons.book, // Modul Pembelajaran
   ];
 
@@ -28,6 +30,7 @@ class HomePage extends StatelessWidget {
     "Daftar Barang",
     "Pencatatan",
     "Penjualan",
+    "Stok Ulang",
     "Modul Pembelajaran",
   ];
 
@@ -98,7 +101,7 @@ class HomePage extends StatelessWidget {
                       ),
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: imgData.length,
+                      itemCount: titles.length,
                       itemBuilder: (context, index) {
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -122,6 +125,12 @@ class HomePage extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => SalesPage()),
+                                  );
+                                } else if (titles[index] == "Stok Ulang") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RestockPage()),
                                   );
                                 }
                               },

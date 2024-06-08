@@ -5,4 +5,4 @@ String formatPrice(int price) {
   return currencyFormat.format(price);
 }
 
-String url = 'https://76a8-2001-448a-3032-30a4-de2c-8afa-4499-4d55.ngrok-free.app';
+String url = 'http://10.0.2.2:8000';
