@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stocklab_fe/widgets/filter_record.dart';
+import 'package:stocklab_fe/widgets/record_search.dart';
 import '../colors.dart';
 import '../models/Record.dart';
 import '../widgets/grid_item_record.dart';
@@ -20,40 +22,20 @@ class DataRecordState extends State<RecordPage> {
   late String _titleProgress;
   var height, width;
   late RecordProvider _recordProvider;
-
-  String selectedSort = 'A-Z';
-
-  void sortRecords(List<Record> records) {
-    if (selectedSort == 'A-Z') {
-      records.sort((a, b) => a.name.compareTo(b.name));
-    } else {
-      records.sort((a, b) => b.name.compareTo(a.name));
-    }
-  }
-
-  bool isSearch = false;
+  late FilterRecords _recordsFilter;
 
   @override
   void initState() {
     super.initState();
     _titleProgress = widget.title;
+    _recordsFilter = FilterRecords();
     Future.microtask(() {
       Provider.of<RecordProvider>(context, listen: false).loadRecords();
     });
   }
 
-  String selectedFilter = 'Semua';
-  // String selectedSort = 'A-Z';
-
   Future<void> _refreshRecords() async {
     await _recordProvider.loadRecords();
-  }
-
-  List<Record> _filterRecords(String query, RecordProvider provider) {
-    return provider.records
-        .where(
-            (record) => record.name.toLowerCase().contains(query.toLowerCase()))
-        .toList();
   }
 
   @override
@@ -67,10 +49,10 @@ class DataRecordState extends State<RecordPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            isSearch
+            _recordsFilter.isSearch
                 ? setState(() {
-              isSearch = false;
-            })
+                    _recordsFilter.isSearch = false;
+                  })
                 : Navigator.of(context).pop();
           },
         ),
@@ -81,14 +63,15 @@ class DataRecordState extends State<RecordPage> {
                 context: context,
                 delegate: RecordSearch(
                   Provider.of<RecordProvider>(context, listen: false),
-                  filterRecords: _filterRecords,
                 ),
               ).then((query) {
                 if (query != null) {
                   setState(() {
-                    _records = _filterRecords(query,
-                        Provider.of<RecordProvider>(context, listen: false));
-                    isSearch = true;
+                    _recordsFilter.searchQuery = query;
+                    _records = _recordsFilter.filterRecords(
+                        Provider.of<RecordProvider>(context, listen: false)
+                            .records);
+                    _recordsFilter.isSearch = true;
                   });
                 }
               });
@@ -112,7 +95,7 @@ class DataRecordState extends State<RecordPage> {
                 child: CircularProgressIndicator(),
               );
             } else {
-              sortRecords(provider.records);
+              _records = _recordsFilter.filterRecords(provider.records);
               return CustomScrollView(
                 slivers: [
                   SliverList(
@@ -129,24 +112,25 @@ class DataRecordState extends State<RecordPage> {
                                   Visibility(
                                     visible: !provider.records.isEmpty,
                                     child: DropdownButton<String>(
-                                      value: selectedFilter,
+                                      value: _recordsFilter.selectedFilter,
                                       onChanged: (value) {
                                         setState(() {
-                                          selectedFilter = value!;
+                                          _recordsFilter.selectedFilter =
+                                              value!;
                                         });
                                       },
                                       items: [
-                                        'Semua',
-                                        'Filter 1',
-                                        'Filter 2',
-                                        'Filter 3'
+                                        'Nama',
+                                        'Quantity',
+                                        'Tipe',
+                                        'Tanggal',
                                       ].map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
                                   SizedBox(
@@ -155,20 +139,20 @@ class DataRecordState extends State<RecordPage> {
                                   Visibility(
                                     visible: !provider.records.isEmpty,
                                     child: DropdownButton<String>(
-                                      value: selectedSort,
+                                      value: _recordsFilter.selectedSort,
                                       onChanged: (value) {
                                         setState(() {
-                                          selectedSort = value!;
+                                          _recordsFilter.selectedSort = value!;
                                         });
                                       },
-                                      items: ['A-Z', 'Z-A']
+                                      items: ['Ascending', 'Descending']
                                           .map<DropdownMenuItem<String>>(
                                               (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
                                 ],
@@ -184,39 +168,39 @@ class DataRecordState extends State<RecordPage> {
                     padding: EdgeInsets.only(bottom: 30),
                     sliver: provider.records.isEmpty
                         ? SliverToBoxAdapter(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20),
-                          Image.asset(
-                            "assets/icon/not_found_item.jpg",
-                            width: 300,
-                            height: 300,
-                          ),
-                          Text(
-                            'Tidak ada data yang tersedia.',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    )
+                            child: Column(
+                              children: [
+                                SizedBox(height: 20),
+                                Image.asset(
+                                  "assets/icon/not_found_item.jpg",
+                                  width: 300,
+                                  height: 300,
+                                ),
+                                Text(
+                                  'Tidak ada data yang tersedia.',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          )
                         : SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        childAspectRatio: 5.5,
-                        mainAxisSpacing: 1,
-                        crossAxisSpacing: 1,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                          final record = isSearch
-                              ? _records[index]
-                              : provider.records[index];
-                          return RecordItem(record: record);
-                        },
-                        childCount:
-                        isSearch ? _records.length : provider.records.length,
-                      ),
-                    ),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              childAspectRatio: 5.5,
+                              mainAxisSpacing: 1,
+                              crossAxisSpacing: 1,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                final record = _records[index];
+                                return RecordItem(record: record);
+                              },
+                              childCount: _recordsFilter.isSearch
+                                  ? _records.length
+                                  : provider.records.length,
+                            ),
+                          ),
                   ),
                 ],
               );
@@ -224,83 +208,6 @@ class DataRecordState extends State<RecordPage> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primary,
-        tooltip: 'Add',
-        onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => AddStockPage()),
-          // );
-        },
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
-      ),
     );
-  }
-}
-
-class RecordSearch extends SearchDelegate {
-  final RecordProvider provider;
-  final List<Record> Function(String, RecordProvider) filterRecords;
-
-  // RecordSearch(this.provider);
-  RecordSearch(this.provider, {required this.filterRecords});
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-          onPressed: () {
-            query = '';
-          },
-          icon: const Icon(Icons.clear)),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-        onPressed: () {
-          close(context, null);
-        },
-        icon: const Icon(Icons.arrow_back));
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    final List<Record> filteredRecords =
-    query.isEmpty ? [] : filterRecords(query.toLowerCase(), provider);
-
-    return ListView.builder(
-      itemCount: filteredRecords.length,
-      itemBuilder: (context, index) {
-        final Record result = filteredRecords[index];
-        return ListTile(
-          title: Text(result.name),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    final List<Record> filteredRecords =
-    query.isEmpty ? [] : filterRecords(query.toLowerCase(), provider);
-
-    return ListView.builder(
-      itemCount: filteredRecords.length,
-      itemBuilder: (context, index) {
-        final Record result = filteredRecords[index];
-        return ListTile(
-            title: Text(result.name),
-            onTap: () {
-              close(context, result.name);
-            });
-      },
-    );
-  }
-
-  @override
-  void showResults(BuildContext context) {
-    Navigator.pop(context, query);
   }
 }
