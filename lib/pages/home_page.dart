@@ -109,7 +109,7 @@ class HomePage extends StatelessWidget {
                                 crossAxisSpacing: 0,
                               ),
                               shrinkWrap: true,
-                              physics: ScrollPhysics(),
+                              physics: NeverScrollableScrollPhysics(),
                               itemCount: titles.length,
                               itemBuilder: (context, index) {
                                 return Column(
@@ -124,8 +124,7 @@ class HomePage extends StatelessWidget {
                                                 builder: (context) =>
                                                     StockPage()),
                                           );
-                                        } else if (titles[index] ==
-                                            "Riwayat") {
+                                        } else if (titles[index] == "Riwayat") {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
