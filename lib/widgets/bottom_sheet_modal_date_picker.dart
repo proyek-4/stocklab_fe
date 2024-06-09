@@ -3,7 +3,10 @@ import '../../widgets/date_picker.dart';
 import '../../colors.dart';
 
 class BottomSheetModalDatePicker extends StatefulWidget {
-  const BottomSheetModalDatePicker({Key? key}) : super(key: key);
+  final Function(String, String, int) onSelected;
+  final int selectedMenu;
+
+  const BottomSheetModalDatePicker({required this.onSelected, required this.selectedMenu, Key? key}) : super(key: key);
 
   @override
   _BottomSheetModalDatePickerState createState() => _BottomSheetModalDatePickerState();
@@ -20,6 +23,8 @@ class _BottomSheetModalDatePickerState extends State<BottomSheetModalDatePicker>
     super.dispose();
   }
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -35,10 +40,7 @@ class _BottomSheetModalDatePickerState extends State<BottomSheetModalDatePicker>
         builder: (BuildContext context, ScrollController scrollController) {
           return Container(
             constraints: BoxConstraints(
-              maxWidth: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
+              maxWidth: MediaQuery.of(context).size.width,
             ),
             child: Scaffold(
               body: Column(
@@ -61,110 +63,108 @@ class _BottomSheetModalDatePickerState extends State<BottomSheetModalDatePicker>
                     child: SingleChildScrollView(
                       controller: scrollController,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 15,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: TextFormField(
-                                      controller: _startDateController,
-                                      readOnly: true,
-                                      onTap: () {
-                                        selectDate(
-                                            context, _startDateController);
-                                      },
-                                      cursorColor: Colors.black,
-                                      decoration: InputDecoration(
-                                        labelText: 'Tanggal Mulai',
-                                        labelStyle: TextStyle(
-                                            color: Colors.black),
-                                        focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: primary),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                                      child: TextFormField(
+                                        controller: _startDateController,
+                                        readOnly: true,
+                                        onTap: () {
+                                          selectDate(context, _startDateController);
+                                        },
+                                        cursorColor: Colors.black,
+                                        decoration: InputDecoration(
+                                          labelText: 'Tanggal Mulai',
+                                          labelStyle: TextStyle(color: Colors.black),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: primary),
+                                          ),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(Icons.calendar_today),
+                                            onPressed: () {
+                                              selectDate(context, _startDateController);
+                                            },
+                                          ),
                                         ),
-                                        suffixIcon: IconButton(
-                                          icon: Icon(Icons.calendar_today),
-                                          onPressed: () {
-                                            selectDate(
-                                                context, _startDateController);
-                                          },
-                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Kolom harus diisi!';
+                                          }
+                                          return null;
+                                        },
                                       ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Kolom harus diisi!';
-                                        }
-                                        return null;
-                                      },
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: TextFormField(
-                                      controller: _endDateController,
-                                      readOnly: true,
-                                      onTap: () {
-                                        selectDate(context, _endDateController);
-                                      },
-                                      cursorColor: Colors.black,
-                                      decoration: InputDecoration(
-                                        labelText: 'Tanggal Selesai',
-                                        labelStyle: TextStyle(
-                                            color: Colors.black),
-                                        focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: primary),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                                      child: TextFormField(
+                                        controller: _endDateController,
+                                        readOnly: true,
+                                        onTap: () {
+                                          selectDate(context, _endDateController);
+                                        },
+                                        cursorColor: Colors.black,
+                                        decoration: InputDecoration(
+                                          labelText: 'Tanggal Selesai',
+                                          labelStyle: TextStyle(color: Colors.black),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: primary),
+                                          ),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(Icons.calendar_today),
+                                            onPressed: () {
+                                              selectDate(context, _endDateController);
+                                            },
+                                          ),
                                         ),
-                                        suffixIcon: IconButton(
-                                          icon: Icon(Icons.calendar_today),
-                                          onPressed: () {
-                                            selectDate(
-                                                context, _endDateController);
-                                          },
-                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Kolom harus diisi!';
+                                          }
+                                          return null;
+                                        },
                                       ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Kolom harus diisi!';
-                                        }
-                                        return null;
-                                      },
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Action when button is pressed
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: primary, // Warna primary
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        30), // Rounded corners
-                                  ),
-                                  padding: EdgeInsets.symmetric(vertical: 15),
-                                ),
-                                child: Text('Pilih'),
+                                ],
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      widget.onSelected(
+                                        _startDateController.text,
+                                        _endDateController.text,
+                                        widget.selectedMenu, // Use the selected menu from widget
+                                      );
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    padding: EdgeInsets.symmetric(vertical: 15),
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: Text('Pilih'),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
