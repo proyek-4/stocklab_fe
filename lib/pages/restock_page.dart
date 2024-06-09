@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stocklab_fe/widgets/filter_stock.dart';
+import 'package:stocklab_fe/widgets/stock_search.dart';
 import '../colors.dart';
 import '../models/Stock.dart';
 import '../widgets/grid_item_sales.dart';
@@ -23,25 +25,16 @@ class DataStockState extends State<RestockPage> {
   late String _titleProgress;
   var height, width;
   late StockProvider _stockProvider;
-
-  String selectedSort = 'A-Z';
-
-  void sortStocks(List<Stock> stocks) {
-    if (selectedSort == 'A-Z') {
-      stocks.sort((a, b) => a.name.compareTo(b.name));
-    } else {
-      stocks.sort((a, b) => b.name.compareTo(a.name));
-    }
-  }
-
-  bool isSearch = false;
+  late FilterStocks _stockFilter;
 
   @override
   void initState() {
     super.initState();
     _titleProgress = widget.title;
+    _stockFilter = FilterStocks();
     Future.microtask(() {
-      Provider.of<StockProvider>(context, listen: false).loadStocks();
+      _stockProvider = Provider.of<StockProvider>(context, listen: false);
+      _stockProvider.loadStocks();
     });
   }
 
@@ -105,18 +98,8 @@ class DataStockState extends State<RestockPage> {
     Provider.of<StockProvider>(context, listen: false).loadStocks();
   }
 
-  String selectedFilter = 'Semua';
-  // String selectedSort = 'A-Z';
-
   Future<void> _refreshStocks() async {
     await _stockProvider.loadStocks();
-  }
-
-  List<Stock> _filterStocks(String query, StockProvider provider) {
-    return provider.stocks
-        .where(
-            (stock) => stock.name.toLowerCase().contains(query.toLowerCase()))
-        .toList();
   }
 
   bool hasInputQuantities() {
@@ -134,10 +117,10 @@ class DataStockState extends State<RestockPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            isSearch
+            _stockFilter.isSearch
                 ? setState(() {
-              isSearch = false;
-            })
+                    _stockFilter.isSearch = false;
+                  })
                 : Navigator.of(context).pop();
           },
         ),
@@ -148,14 +131,15 @@ class DataStockState extends State<RestockPage> {
                 context: context,
                 delegate: StockSearch(
                   Provider.of<StockProvider>(context, listen: false),
-                  filterStocks: _filterStocks,
                 ),
               ).then((query) {
                 if (query != null) {
                   setState(() {
-                    _stocks = _filterStocks(query,
-                        Provider.of<StockProvider>(context, listen: false));
-                    isSearch = true;
+                    _stockFilter.searchQuery = query;
+                    _stocks = _stockFilter.filterStocks(
+                        Provider.of<StockProvider>(context, listen: false)
+                            .stocks);
+                    _stockFilter.isSearch = true;
                   });
                 }
               });
@@ -179,8 +163,7 @@ class DataStockState extends State<RestockPage> {
                 child: CircularProgressIndicator(),
               );
             } else {
-              _stocks = provider.stocks;
-              sortStocks(provider.stocks);
+              _stocks = _stockFilter.filterStocks(provider.stocks);
               return CustomScrollView(
                 slivers: [
                   SliverList(
@@ -197,24 +180,24 @@ class DataStockState extends State<RestockPage> {
                                   Visibility(
                                     visible: !provider.stocks.isEmpty,
                                     child: DropdownButton<String>(
-                                      value: selectedFilter,
+                                      value: _stockFilter.selectedFilter,
                                       onChanged: (value) {
                                         setState(() {
-                                          selectedFilter = value!;
+                                          _stockFilter.selectedFilter = value!;
                                         });
                                       },
                                       items: [
-                                        'Semua',
-                                        'Filter 1',
-                                        'Filter 2',
-                                        'Filter 3'
+                                        'Nama',
+                                        'Quantity',
+                                        'Harga Modal',
+                                        'Harga Jual',
                                       ].map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
                                   SizedBox(
@@ -223,20 +206,20 @@ class DataStockState extends State<RestockPage> {
                                   Visibility(
                                     visible: !provider.stocks.isEmpty,
                                     child: DropdownButton<String>(
-                                      value: selectedSort,
+                                      value: _stockFilter.selectedSort,
                                       onChanged: (value) {
                                         setState(() {
-                                          selectedSort = value!;
+                                          _stockFilter.selectedSort = value!;
                                         });
                                       },
-                                      items: ['A-Z', 'Z-A']
+                                      items: ['Ascending', 'Descending']
                                           .map<DropdownMenuItem<String>>(
                                               (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
                                 ],
@@ -252,46 +235,46 @@ class DataStockState extends State<RestockPage> {
                     padding: EdgeInsets.only(bottom: 30),
                     sliver: provider.stocks.isEmpty
                         ? SliverToBoxAdapter(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20),
-                          Image.asset(
-                            "assets/icon/not_found_item.jpg",
-                            width: 300,
-                            height: 300,
-                          ),
-                          Text(
-                            'Tidak ada data yang tersedia.',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    )
+                            child: Column(
+                              children: [
+                                SizedBox(height: 20),
+                                Image.asset(
+                                  "assets/icon/not_found_item.jpg",
+                                  width: 300,
+                                  height: 300,
+                                ),
+                                Text(
+                                  'Tidak ada data yang tersedia.',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          )
                         : SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        childAspectRatio: 4.3,
-                        mainAxisSpacing: 1,
-                        crossAxisSpacing: 1,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                          final stock = isSearch
-                              ? _stocks[index]
-                              : provider.stocks[index];
-                          return SalesItem(
-                            stock: stock,
-                            onQuantityChanged: (int newQuantity) {
-                              setState(() {
-                                stock.selectedQuantity = newQuantity;
-                              });
-                            },
-                          );
-                        },
-                        childCount:
-                        isSearch ? _stocks.length : provider.stocks.length,
-                      ),
-                    ),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              childAspectRatio: 4.3,
+                              mainAxisSpacing: 1,
+                              crossAxisSpacing: 1,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                final stock = _stocks[index];
+                                return SalesItem(
+                                  stock: stock,
+                                  onQuantityChanged: (int newQuantity) {
+                                    setState(() {
+                                      stock.selectedQuantity = newQuantity;
+                                    });
+                                  },
+                                );
+                              },
+                              childCount: _stockFilter.isSearch
+                                  ? _stocks.length
+                                  : provider.stocks.length,
+                            ),
+                          ),
                   ),
                 ],
               );
@@ -301,80 +284,15 @@ class DataStockState extends State<RestockPage> {
       ),
       floatingActionButton: hasInputQuantities()
           ? FloatingActionButton(
-        backgroundColor: primary,
-        tooltip: 'Kirim',
-        onPressed: () {
-          _showConfirmationDialog(context);
-        },
-        child: const Icon(Icons.arrow_right_alt, color: Colors.white, size: 28),
-      )
+              backgroundColor: primary,
+              tooltip: 'Kirim',
+              onPressed: () {
+                _showConfirmationDialog(context);
+              },
+              child: const Icon(Icons.arrow_right_alt,
+                  color: Colors.white, size: 28),
+            )
           : null,
     );
-  }
-}
-
-class StockSearch extends SearchDelegate {
-  final StockProvider provider;
-  final List<Stock> Function(String, StockProvider) filterStocks;
-
-  // StockSearch(this.provider);
-  StockSearch(this.provider, {required this.filterStocks});
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-          onPressed: () {
-            query = '';
-          },
-          icon: const Icon(Icons.clear)),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-        onPressed: () {
-          close(context, null);
-        },
-        icon: const Icon(Icons.arrow_back));
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    final List<Stock> filteredStocks =
-    query.isEmpty ? [] : filterStocks(query.toLowerCase(), provider);
-
-    return ListView.builder(
-      itemCount: filteredStocks.length,
-      itemBuilder: (context, index) {
-        final Stock result = filteredStocks[index];
-        return ListTile(
-          title: Text(result.name),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    final List<Stock> filteredStocks =
-    query.isEmpty ? [] : filterStocks(query.toLowerCase(), provider);
-
-    return ListView.builder(
-      itemCount: filteredStocks.length,
-      itemBuilder: (context, index) {
-        final Stock result = filteredStocks[index];
-        return ListTile(
-            title: Text(result.name),
-            onTap: () {
-              close(context, result.name);
-            });
-      },
-    );
-  }
-
-  @override
-  void showResults(BuildContext context) {
-    Navigator.pop(context, query);
   }
 }
