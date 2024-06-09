@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stocklab_fe/widgets/filter_stock.dart';
+import 'package:stocklab_fe/widgets/stock_search.dart';
 import '../colors.dart';
 import '../models/Stock.dart';
 import '../widgets/grid_item_stock.dart';
@@ -20,16 +22,13 @@ class DataStockState extends State<StockPage> {
   late String _titleProgress;
   var height, width;
   late StockProvider _stockProvider;
-  bool isSearch = false;
-  String searchQuery = '';
-
-  String selectedSort = 'Ascending';
-  String selectedFilter = 'Nama';
+  late FilterStocks _stockFilter;
 
   @override
   void initState() {
     super.initState();
     _titleProgress = widget.title;
+    _stockFilter = FilterStocks();
     Future.microtask(() {
       _stockProvider = Provider.of<StockProvider>(context, listen: false);
       _stockProvider.loadStocks();
@@ -38,39 +37,6 @@ class DataStockState extends State<StockPage> {
 
   Future<void> _refreshStocks() async {
     await _stockProvider.loadStocks();
-  }
-
-  List<Stock> _filterStocks(String filter, List<Stock> stocks) {
-    switch (filter) {
-      case 'Nama':
-        stocks.sort((a, b) => a.name.compareTo(b.name));
-        break;
-      case 'Quantity':
-        stocks.sort((a, b) => a.quantity.compareTo(b.quantity));
-        break;
-      case 'Harga Modal':
-        stocks.sort((a, b) => a.cost.compareTo(b.cost));
-        break;
-      case 'Harga Jual':
-        stocks.sort((a, b) => a.price.compareTo(b.price));
-        break;
-      case 'Tanggal':
-        stocks.sort((a, b) => a.date.compareTo(b.date));
-        break;
-      default:
-        // Default case if 'Semua' or unknown filter
-        break;
-    }
-    if (selectedSort == 'Descending') {
-      stocks = stocks.reversed.toList();
-    }
-    if (isSearch == true) {
-      return stocks
-          .where((stock) =>
-              stock.name.toLowerCase().contains(searchQuery.toLowerCase()))
-          .toList();
-    }
-    return stocks;
   }
 
   @override
@@ -84,9 +50,9 @@ class DataStockState extends State<StockPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            isSearch
+            _stockFilter.isSearch
                 ? setState(() {
-                    isSearch = false;
+                    _stockFilter.isSearch = false;
                   })
                 : Navigator.of(context).pop();
           },
@@ -98,21 +64,15 @@ class DataStockState extends State<StockPage> {
                 context: context,
                 delegate: StockSearch(
                   Provider.of<StockProvider>(context, listen: false),
-                  filterStocks: (query, provider) => provider.stocks
-                      .where((stock) => stock.name
-                          .toLowerCase()
-                          .contains(query.toLowerCase()))
-                      .toList(),
                 ),
               ).then((query) {
                 if (query != null) {
                   setState(() {
-                    searchQuery = query;
-                    _stocks = _filterStocks(
-                        selectedFilter,
+                    _stockFilter.searchQuery = query;
+                    _stocks = _stockFilter.filterStocks(
                         Provider.of<StockProvider>(context, listen: false)
                             .stocks);
-                    isSearch = true;
+                    _stockFilter.isSearch = true;
                   });
                 }
               });
@@ -133,7 +93,7 @@ class DataStockState extends State<StockPage> {
                 child: CircularProgressIndicator(),
               );
             } else {
-              _stocks = _filterStocks(selectedFilter, provider.stocks);
+              _stocks = _stockFilter.filterStocks(provider.stocks);
               return CustomScrollView(
                 slivers: [
                   SliverList(
@@ -150,12 +110,12 @@ class DataStockState extends State<StockPage> {
                                   Visibility(
                                     visible: !provider.stocks.isEmpty,
                                     child: DropdownButton<String>(
-                                      value: selectedFilter,
+                                      value: _stockFilter.selectedFilter,
                                       onChanged: (value) {
                                         setState(() {
-                                          selectedFilter = value!;
-                                          _stocks = _filterStocks(
-                                              selectedFilter, provider.stocks);
+                                          _stockFilter.selectedFilter = value!;
+                                          _stocks = _stockFilter
+                                              .filterStocks(provider.stocks);
                                         });
                                       },
                                       items: [
@@ -179,12 +139,12 @@ class DataStockState extends State<StockPage> {
                                   Visibility(
                                     visible: !provider.stocks.isEmpty,
                                     child: DropdownButton<String>(
-                                      value: selectedSort,
+                                      value: _stockFilter.selectedSort,
                                       onChanged: (value) {
                                         setState(() {
-                                          selectedSort = value!;
-                                          _stocks = _filterStocks(
-                                              selectedFilter, provider.stocks);
+                                          _stockFilter.selectedSort = value!;
+                                          _stocks = _stockFilter
+                                              .filterStocks(provider.stocks);
                                         });
                                       },
                                       items: ['Ascending', 'Descending']
@@ -238,7 +198,7 @@ class DataStockState extends State<StockPage> {
                                 final stock = _stocks[index];
                                 return StockItem(stock: stock);
                               },
-                              childCount: isSearch
+                              childCount: _stockFilter.isSearch
                                   ? _stocks.length
                                   : provider.stocks.length,
                             ),
@@ -262,70 +222,5 @@ class DataStockState extends State<StockPage> {
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
-  }
-}
-
-class StockSearch extends SearchDelegate {
-  final StockProvider provider;
-  final List<Stock> Function(String, StockProvider) filterStocks;
-
-  StockSearch(this.provider, {required this.filterStocks});
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-          onPressed: () {
-            query = '';
-          },
-          icon: const Icon(Icons.clear)),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-        onPressed: () {
-          close(context, null);
-        },
-        icon: const Icon(Icons.arrow_back));
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    final List<Stock> filteredStocks =
-        query.isEmpty ? [] : filterStocks(query.toLowerCase(), provider);
-
-    return ListView.builder(
-      itemCount: filteredStocks.length,
-      itemBuilder: (context, index) {
-        final Stock result = filteredStocks[index];
-        return ListTile(
-          title: Text(result.name),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    final List<Stock> filteredStocks =
-        query.isEmpty ? [] : filterStocks(query.toLowerCase(), provider);
-
-    return ListView.builder(
-      itemCount: filteredStocks.length,
-      itemBuilder: (context, index) {
-        final Stock result = filteredStocks[index];
-        return ListTile(
-            title: Text(result.name),
-            onTap: () {
-              close(context, result.name);
-            });
-      },
-    );
-  }
-
-  @override
-  void showResults(BuildContext context) {
-    Navigator.pop(context, query);
   }
 }
