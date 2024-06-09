@@ -102,17 +102,15 @@ class RecordItem extends StatelessWidget {
                 ),
               ),
               Icon(
-                record.kredit == 0 ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                color: record.kredit == 0 ? Colors.green : Colors.red,
+                record.type == 'in'
+                    ? Icons.arrow_upward_rounded
+                    : Icons.arrow_downward_rounded,
+                color: record.type == 'in' ? Colors.green : Colors.red,
                 size: 24.0,
               ),
               // Tambahkan ikon titik tiga di pojok kanan atas
               PopupMenuButton<String>(
                 itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'edit',
-                    child: Text('Ubah'),
-                  ),
                   PopupMenuItem(
                     value: 'delete',
                     child: Text('Hapus'),
