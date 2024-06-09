@@ -6,6 +6,7 @@ import 'package:stocklab_fe/provider/UserProvider.dart';
 import 'record_page.dart';
 import 'sales_page.dart';
 import 'restock_page.dart';
+import 'recap_page.dart';
 
 // ignore: must_be_immutable
 class HomePage extends StatelessWidget {
@@ -20,18 +21,20 @@ class HomePage extends StatelessWidget {
 
   List<IconData> icons = [
     Icons.article, // Daftar Barang
-    Icons.note_alt, // Pencatatan
+    Icons.settings_backup_restore_outlined, // Pencatatan
     Icons.sell, // Penjualan
     Icons.add_business_outlined,
     Icons.book, // Modul Pembelajaran
+    Icons.note_alt,
   ];
 
   List titles = [
     "Daftar Barang",
-    "Pencatatan",
+    "Riwayat",
     "Penjualan",
     "Stok Ulang",
     "Modul Pembelajaran",
+    "Rekapitulasi"
   ];
 
   @override
@@ -100,8 +103,8 @@ class HomePage extends StatelessWidget {
                             child: GridView.builder(
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 1.3,
+                                crossAxisCount: 3,
+                                childAspectRatio: 0.8,
                                 mainAxisSpacing: 15,
                                 crossAxisSpacing: 0,
                               ),
@@ -122,7 +125,7 @@ class HomePage extends StatelessWidget {
                                                     StockPage()),
                                           );
                                         } else if (titles[index] ==
-                                            "Pencatatan") {
+                                            "Riwayat") {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -144,6 +147,14 @@ class HomePage extends StatelessWidget {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     RestockPage()),
+                                          );
+                                        } else if (titles[index] ==
+                                            "Rekapitulasi") {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RecapPage()),
                                           );
                                         }
                                       },
@@ -197,10 +208,10 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
                 Positioned(
-                  top: height * 0.33,
-                  left: (width - 350) / 2,
+                  top: height * 0.38,
+                  left: (width - 340) / 2,
                   child: Container(
-                    width: 350,
+                    width: 340,
                     height: 70,
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -214,7 +225,7 @@ class HomePage extends StatelessWidget {
                         ]),
                     child: Center(
                       child: Text(
-                        "Special Container",
+                        "Gudang 1",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

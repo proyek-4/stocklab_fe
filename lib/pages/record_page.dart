@@ -9,7 +9,7 @@ import '../provider/RecordProvider.dart';
 class RecordPage extends StatefulWidget {
   RecordPage() : super();
 
-  final String title = "Pencatatan";
+  final String title = "Riwayat";
 
   @override
   DataRecordState createState() => DataRecordState();
